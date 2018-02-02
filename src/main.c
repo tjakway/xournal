@@ -161,6 +161,27 @@ void init_stuff (int argc, char *argv[])
 
   // set up and initialize the canvas
 
+
+  
+
+  //add the mapped area rectangle
+  GnomeCanvasRect* mapped_rect;
+  //outline: 1.0, 0.0, 0.0, 0.0
+  //fill: 1.0, 1.0, 1.0, 1.0
+  mapped_rect = gnome_canvas_item_new(
+          gnome_canvas_root(canvas),
+          GNOME_TYPE_CANVAS_RECT,
+          "x1", 1.0,
+          "y1", 1.0,
+          "x2", 400.0,
+          "y2", 400.0,
+          "width_pixels", 10,
+          "fill-color-rgba", 0xFFFFFFFF,
+          "outline-color-rgba", 0xFF000000,
+          NULL
+          );
+
+
   gtk_widget_show (GTK_WIDGET (canvas));
   w = GET_COMPONENT("scrolledwindowMain");
   gtk_container_add (GTK_CONTAINER (w), GTK_WIDGET (canvas));
