@@ -165,7 +165,7 @@ void init_stuff (int argc, char *argv[])
   
 
   //add the mapped area rectangle
-  GnomeCanvasRect* mapped_rect;
+  /*GnomeCanvasRect* mapped_rect;
   //outline: 1.0, 0.0, 0.0, 0.0
   //fill: 1.0, 1.0, 1.0, 1.0
   mapped_rect = gnome_canvas_item_new(
@@ -179,8 +179,23 @@ void init_stuff (int argc, char *argv[])
           "fill-color-rgba", 0xFFFFFFFF,
           "outline-color-rgba", 0xFF000000,
           NULL
-          );
+          );*/
 
+  GnomeCanvasPoints* points = gnome_canvas_points_new(2);
+  points->coords[0] = 0.0;
+  points->coords[1] = 0.0;
+  points->coords[2] = 100.0;
+  points->coords[3] = 100.0;
+
+  GnomeCanvasItem* lineItem = gnome_canvas_item_new(
+          gnome_canvas_root(canvas), 
+          gnome_canvas_line_get_type(),
+          "points", points,
+          "fill-color-rgba", 0xFF0000FF,
+          "width-pixels", 80,
+          NULL);
+
+  gnome_canvas_item_raise_to_top(lineItem);
 
   gtk_widget_show (GTK_WIDGET (canvas));
   w = GET_COMPONENT("scrolledwindowMain");
