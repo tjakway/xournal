@@ -2,6 +2,9 @@
 
 #include <libgnomecanvas/libgnomecanvas.h>
 
+#include "xo-map-to-output-error.h"
+#include "xo-tablet-driver.h"
+
 typedef struct MapToOutputConfig {
     const char* driver_program;
     const char** driver_argv;
@@ -9,18 +12,10 @@ typedef struct MapToOutputConfig {
 
     //default: red
     guint line_color;
-};
 
-/****error types*****/
-enum MapToOutputErrorType {
-    NO_ERROR = 0,
-    BAD_MALLOC;
-};
+    TabletDriver driver;
+} MapToOutputConfig;
 
-typedef struct MapToOutputError {
-    enum MapToOutputErrorType err_type;
-    char* err_msg;
-};
 
 //probably don't need these, just use statically
 //allocated error structures
@@ -47,7 +42,7 @@ typedef struct MapToOutput {
 
     gdouble bottom_left_x, bottom_left_y,
             top_right_x, top_right_y;
-};
+} MapToOutput;
 
 //pass NULL for default config
 MapToOutput* map_to_output_init(

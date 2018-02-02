@@ -16,15 +16,6 @@ static MapToOutputError bad_malloc {
 };
 
 
-static void get_tablet_dimensions(
-        unsigned int* width,
-        unsigned int* height,
-        MapToOutputError* err)
-{
-
-}
-
-
 MapToOutput* map_to_output_init(
         MapToOutputConfig* config_param, 
         GnomeCanvas* canvas,
