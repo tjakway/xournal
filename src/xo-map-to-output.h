@@ -14,7 +14,7 @@ typedef struct MapToOutputConfig {
 /****error types*****/
 enum MapToOutputErrorType {
     NO_ERROR = 0,
-    INIT_ERROR;
+    BAD_MALLOC;
 };
 
 typedef struct MapToOutputError {
@@ -22,14 +22,23 @@ typedef struct MapToOutputError {
     char* err_msg;
 };
 
-MapToOutputError* map_to_output_err_new();
-void map_to_output_err_free(MapToOutputError*);
+//probably don't need these, just use statically
+//allocated error structures
+//MapToOutputError* map_to_output_err_new();
+//void map_to_output_err_free(MapToOutputError*);
 
 
 /********************/
 
 typedef struct MapToOutput {
     MapToOutputConfig* config;
+
+    GnomeCanvas* canvas;
+
+    guint width, height;
+    double pixels_per_unit;
+
+    unsigned int tablet_width, tablet_height;
 
     GnomeCanvasItem* left_line, 
         right_line, 
@@ -44,6 +53,9 @@ typedef struct MapToOutput {
 MapToOutput* map_to_output_init(
         MapToOutputConfig*, 
         GnomeCanvas*,
+        guint width,
+        guint height,
+        double pixels_per_unit,
         MapToOutputError*);
 
 void map_to_output_free(
@@ -54,17 +66,14 @@ void map_to_output_free(
  * if needs_new_page is set to true, call map_to_output_new_page immediately
  */
 void map_to_output_shift_down(
-        MapToOutputConfig*, 
-        GnomeCanvas*,
+        MapToOutput*, 
         gboolean* needs_new_page,
         MapToOutputError*);
 
 void map_to_output_new_page(
-        MapToOutputConfig*, 
-        GnomeCanvas*,
+        MapToOutput*, 
         MapToOutputError*);
 
 void map_to_output_on_resize(
-        MapToOutputConfig*, 
-        GnomeCanvas*,
+        MapToOutput*, 
         MapToOutputError*);

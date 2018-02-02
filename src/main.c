@@ -192,7 +192,7 @@ void init_stuff (int argc, char *argv[])
           gnome_canvas_line_get_type(),
           "points", points,
           "fill-color-rgba", 0xFF0000FF,
-          "width-pixels", 80,
+          "width-units", 1.0,
           NULL);
 
   gnome_canvas_item_raise_to_top(lineItem);
