@@ -70,6 +70,10 @@ void map_to_output_new_page(
         MapToOutput*, 
         MapToOutputError*);
 
+/**
+ * TODO: this is necessary because we're mapping **screen** pixels to the canvas so we need
+ * to resize it such that the same window is shown
+ */
 void map_to_output_on_resize(
         MapToOutput*, 
         MapToOutputError*);
