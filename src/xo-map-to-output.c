@@ -102,13 +102,22 @@ static void output_box_to_lines(OutputBox output_box,
 static void make_output_box_lines(
         MapToOutput* output,
         OutputBox output_box,
-        GnomeCanvas* canvas)
+        GnomeCanvas* canvas,
+        MapToOutputError* err)
 {
 
     GnomeCanvasPoints *top_line_points = gnome_canvas_points_new(2),
                       *right_line_points = gnome_canvas_points_new(2),
                       *bottom_line_points = gnome_canvas_points_new(2),
                       *left_line_points = gnome_canvas_points_new(2);
+
+    if(top_line_points == NULL
+            || right_line_points == NULL
+            || bottom_line_points == NULL
+            || left_line_points == NULL)
+    {
+        //TODO: error
+    }
 
     output_box_to_lines(output_box, 
             top_line_points->coords,
