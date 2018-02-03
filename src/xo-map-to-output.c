@@ -99,6 +99,66 @@ static void output_box_to_lines(OutputBox output_box,
     left[3] = bottom_left[1];
 }
 
+static void make_output_box_lines(
+        MapToOutput* output,
+        OutputBox output_box,
+        GnomeCanvas* canvas)
+{
+
+    GnomeCanvasPoints *top_line_points = gnome_canvas_points_new(2),
+                      *right_line_points = gnome_canvas_points_new(2),
+                      *bottom_line_points = gnome_canvas_points_new(2),
+                      *left_line_points = gnome_canvas_points_new(2);
+
+    output_box_to_lines(output_box, 
+            top_line_points->coords,
+            right_line_points->coords,
+            bottom_line_points->coords,
+            left_line_points->coords);
+
+    const guint line_color = output->config->line_color;
+    const double line_width_units = output->config->line_width_units;
+
+    output.top_line = gnome_canvas_item_new(
+          gnome_canvas_root(canvas), 
+          gnome_canvas_line_get_type(),
+          "points", top_line_points,
+          "fill-color-rgba", line_color,
+          "width-units", line_width_units,
+          NULL);
+
+    output.right_line = gnome_canvas_item_new(
+          gnome_canvas_root(canvas), 
+          gnome_canvas_line_get_type(),
+          "points", right_line_points,
+          "fill-color-rgba", line_color,
+          "width-units", line_width_units,
+          NULL);
+
+    output.bottom_line = gnome_canvas_item_new(
+          gnome_canvas_root(canvas), 
+          gnome_canvas_line_get_type(),
+          "points", bottom_line_points,
+          "fill-color-rgba", line_color,
+          "width-units", line_width_units,
+          NULL);
+
+    output.left_line = gnome_canvas_item_new(
+          gnome_canvas_root(canvas), 
+          gnome_canvas_line_get_type(),
+          "points", left_line_points,
+          "fill-color-rgba", line_color,
+          "width-units", line_width_units,
+          NULL);
+
+    if(output.top_line == NULL 
+            || output.right_line == NULL
+            || output.bottom_line == NULL
+            || output.left_line == NULL)
+    {
+        //TODO: handle error
+    }
+}
 
 
 
@@ -128,7 +188,7 @@ MapToOutput* map_to_output_init(
 
 
     //need the tablet dimensions to calculate the aspect ratio
-    map_to_output->config.get_table_dimensions(
+    map_to_output->config.get_tablet_dimensions(
             &map_to_output->tablet_width,
             &map_to_output->tablet_height,
             err);
@@ -137,4 +197,27 @@ MapToOutput* map_to_output_init(
     {
         return NULL;
     }
+
+
+    gboolean needs_new_page;
+    OutputBox output_box = calculate_output_box(
+            //blank canvas, therefore a new page
+            //so the top left is the origin
+            0, 0, 
+            //canvas dimensions
+            width, height,
+            //tablet dimensions
+            map_to_output->tablet_width, map_to_output->tablet_height,
+            &needs_new_page);
+
+    if(needs_new_page)
+    {
+        //TODO: error... can't need a new page before we've even started
+        //probably means our window is too small
+    }
+
+
+
+
+
 }
