@@ -236,7 +236,7 @@ MapToOutput* map_to_output_init(
 
 
     //call the tablet driver and map the tablet's output to our canvas region
-    output->config->driver.map_to_output(output_box.width, output_box.height,
+    map_to_output->config->driver.map_to_output(output_box.width, output_box.height,
             output_box.top_left_x, output_box.top_left_y, err);
     if(err->err_type != NO_ERROR)
     {
@@ -244,11 +244,11 @@ MapToOutput* map_to_output_init(
     }
 
     //outline the mapped output box so the user can see it
-    make_output_box_lines(output, output_box, canvas, err);
+    make_output_box_lines(map_to_output, output_box, canvas, err);
     if(err->err_type != NO_ERROR)
     {
         //reset the output mapping before returning
-        output->config->driver.reset_map_to_output(NULL);
+        map_to_output->config->driver.reset_map_to_output(NULL);
         
         return NULL;
     }
