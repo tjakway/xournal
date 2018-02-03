@@ -14,3 +14,6 @@ gboolean map_to_output_mapped_rect_is_visible(MapToOutput*, MapToOutputError*);
  * (need to check that they match in pixels within a certain margin
  */
 gboolean map_to_output_mapping_is_correct(MapToOutput*, MapToOutputError*);
+
+//map_to_output_mapped_rect_is_visible should return true after calling this
+void map_to_output_scroll_to_mapped_rect(MapToOutput*, MapToOutputError*);
