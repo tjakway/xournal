@@ -37,10 +37,10 @@ typedef struct MapToOutput {
 
     unsigned int tablet_width, tablet_height;
 
-    GnomeCanvasItem* left_line, 
-        right_line, 
-        top_line, 
-        bottom_line;
+    GnomeCanvasItem *left_line, 
+        *right_line, 
+        *top_line, 
+        *bottom_line;
 
     guint bottom_left_x, bottom_left_y,
             top_right_x, top_right_y;
@@ -52,7 +52,6 @@ MapToOutput* map_to_output_init(
         GnomeCanvas*,
         guint width,
         guint height,
-        double pixels_per_unit,
         MapToOutputError*);
 
 void map_to_output_free(

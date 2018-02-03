@@ -4,7 +4,8 @@
 enum MapToOutputErrorType {
     NO_ERROR = 0,
     BAD_MALLOC,
-    DRIVER_GET_TABLET_DIMENSIONS
+    DRIVER_GET_TABLET_DIMENSIONS,
+    CANVAS_INIT_ERROR
 };
 
 typedef struct MapToOutputError {
@@ -14,12 +15,13 @@ typedef struct MapToOutputError {
 
 
 //TODO: add more error structs
-static MapToOutputError no_error {
+static MapToOutputError no_error = {
     .err_type = NO_ERROR,
     .err_msg = "Success"
 };
 
-static MapToOutputError bad_malloc {
+static MapToOutputError bad_malloc = {
     .err_type = BAD_MALLOC,
     .err_msg = "malloc returned NULL"
 };
+

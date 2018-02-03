@@ -31,13 +31,13 @@ static OutputBox calculate_output_box(
     output_box.top_left_y = top_left_y;
 
     const guint max_height = top_left_y + canvas_height;
-    if((top_left_y + output_box_height) > max_height)
+    if((top_left_y + output_box.height) > max_height)
     {
-        *needs_new_page = true;
+        *needs_new_page = TRUE;
     }
     else
     {
-        *needs_new_page = false;
+        *needs_new_page = FALSE;
     }
 
     return output_box;
@@ -49,16 +49,16 @@ static void output_box_to_lines(OutputBox output_box,
         double* bottom,
         double* left)
 {
-    const double[] top_left = { output_box.top_left_x, output_box.top_left_y };
+    const double top_left[] = { output_box.top_left_x, output_box.top_left_y };
 
-    const double[] top_right = 
+    const double top_right[] = 
             { output_box.top_left_x + output_box.width, output_box.top_left_y };
 
-    const double[] bottom_left = 
+    const double bottom_left[] = 
             { output_box.top_left_x, 
                 output_box.top_left_y  + output_box.height };
 
-    const double[] bottom_right = 
+    const double bottom_right[] = 
             { output_box.top_left_x + output_box.width, 
                 output_box.top_left_y  + output_box.height };
 
@@ -118,7 +118,7 @@ static void make_output_box_lines(
     {
         static MapToOutputError null_points_error = {
             .err_type = CANVAS_INIT_ERROR,
-            .err_msg = "gnome_canvas_points_new(2) returned NULL in " __func__ 
+            .err_msg = "gnome_canvas_points_new(2) returned NULL"
         };
 
         *err = null_points_error;
@@ -133,7 +133,7 @@ static void make_output_box_lines(
     const guint line_color = output->config->line_color;
     const double line_width_units = output->config->line_width_units;
 
-    output.top_line = gnome_canvas_item_new(
+    output->top_line = gnome_canvas_item_new(
           gnome_canvas_root(canvas), 
           gnome_canvas_line_get_type(),
           "points", top_line_points,
@@ -141,7 +141,7 @@ static void make_output_box_lines(
           "width-units", line_width_units,
           NULL);
 
-    output.right_line = gnome_canvas_item_new(
+    output->right_line = gnome_canvas_item_new(
           gnome_canvas_root(canvas), 
           gnome_canvas_line_get_type(),
           "points", right_line_points,
@@ -149,7 +149,7 @@ static void make_output_box_lines(
           "width-units", line_width_units,
           NULL);
 
-    output.bottom_line = gnome_canvas_item_new(
+    output->bottom_line = gnome_canvas_item_new(
           gnome_canvas_root(canvas), 
           gnome_canvas_line_get_type(),
           "points", bottom_line_points,
@@ -157,7 +157,7 @@ static void make_output_box_lines(
           "width-units", line_width_units,
           NULL);
 
-    output.left_line = gnome_canvas_item_new(
+    output->left_line = gnome_canvas_item_new(
           gnome_canvas_root(canvas), 
           gnome_canvas_line_get_type(),
           "points", left_line_points,
@@ -165,14 +165,14 @@ static void make_output_box_lines(
           "width-units", line_width_units,
           NULL);
 
-    if(output.top_line == NULL 
-            || output.right_line == NULL
-            || output.bottom_line == NULL
-            || output.left_line == NULL)
+    if(output->top_line == NULL 
+            || output->right_line == NULL
+            || output->bottom_line == NULL
+            || output->left_line == NULL)
     {
         static MapToOutputError null_item_error = {
             .err_type = CANVAS_INIT_ERROR,
-            .err_msg = "gnome_canvas_item_new(2) returned NULL in " __func__
+            .err_msg = "gnome_canvas_item_new(2) returned NULL" 
         };
 
         *err = null_item_error;
@@ -207,7 +207,7 @@ MapToOutput* map_to_output_init(
 
 
     //need the tablet dimensions to calculate the aspect ratio
-    map_to_output->config.get_tablet_dimensions(
+    map_to_output->config->driver.get_tablet_dimensions(
             &map_to_output->tablet_width,
             &map_to_output->tablet_height,
             err);
