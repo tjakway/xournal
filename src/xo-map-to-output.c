@@ -6,10 +6,6 @@
 static MapToOutputConfig default_config;
 
 
-typedef struct OutputBox {
-    double top_left_x, top_left_y;
-    guint width, height;
-} OutputBox;
 
 static OutputBox calculate_output_box(
         double top_left_x,
@@ -180,6 +176,23 @@ static void make_output_box_lines(
 }
 
 
+//allocate the struct and set default values
+//return NULL on failure
+static MapToOutput* alloc_map_to_output()
+{
+    MapToOutput* map_to_output = malloc(sizeof(MapToOutput));
+    if(map_to_output != NULL)
+    {
+        //null out all fields
+        //see https://stackoverflow.com/questions/34958467/how-to-initialize-all-the-pointer-fields-of-struct-pointer-to-null
+        //for an explanation of this syntax
+        *map_to_output = (struct MapToOutput){ 0 };
+
+        map_to_output->pixels_per_unit = -1.0;
+    }
+    return map_to_output;
+}
+
 
 MapToOutput* map_to_output_init(
         MapToOutputConfig* config_param, 
@@ -198,7 +211,7 @@ MapToOutput* map_to_output_init(
         config = config_param;
     }
 
-    MapToOutput* map_to_output = malloc(sizeof(MapToOutput));
+    MapToOutput* map_to_output = alloc_map_to_output();
     if(map_to_output == NULL)
     {
         *err = bad_malloc;
@@ -232,6 +245,7 @@ MapToOutput* map_to_output_init(
     {
         //TODO: error... can't need a new page before we've even started
         //probably means our window is too small
+        //TODO: try resizing it and see if that fixes it, otherwise warn the user and disable the mapping
     }
 
 
