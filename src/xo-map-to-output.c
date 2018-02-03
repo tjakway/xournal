@@ -280,6 +280,8 @@ MapToOutput* map_to_output_init(
     return map_to_output;
 
 map_to_output_init_error:
+    g_warn_if_reached();
+
     //if we're returning with an error we should have set an error message
     assert(err->err_type != NO_ERROR);
 
@@ -288,4 +290,42 @@ map_to_output_init_error:
         free(map_to_output);
     }
     return NULL;
+}
+
+//sanity checks (mostly null checks)
+//should only be called after MapToOutput is initialized by map_to_output_init
+void map_to_output_asserts(MapToOutput* map_to_output)
+{
+    assert(map_to_output != NULL);
+
+    //see https://developer.gnome.org/glib/stable/glib-Warnings-and-Assertions.html
+    //for glib warnings & assertions
+    
+    //do non-fatal checks before the assertions
+    //if unsigned types are equal to their max, it's probably an error
+    //(likely caused by an overflow)
+    g_warn_if_fail(map_to_output->tablet_width == GUINT_MAX);
+    g_warn_if_fail(map_to_output->tablet_height == GUINT_MAX);
+    g_warn_if_fail(map_to_output->height == GUINT_MAX);
+    g_warn_if_fail(map_to_output->width == GUINT_MAX);
+
+
+    if(map_to_output->mapping_mode == NO_MAPPING)
+    {
+        assert(map_to_output->output_box == NULL);
+    }
+    else
+    {
+        assert(map_to_output->output_box != NULL);
+    }
+
+    assert(map_to_output->config != NULL);
+    assert(map_to_output->canvas != NULL);
+    assert(map_to_output->left_line != NULL);
+    assert(map_to_output->right_line != NULL);
+    assert(map_to_output->top_line != NULL);
+    assert(map_to_output->bottom_line != NULL);
+
+    assert(map_to_output->pixels_per_unit > 0);
+
 }
