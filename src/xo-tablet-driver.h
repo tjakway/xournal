@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xo-map-to-output-error.h"
+#include "xo-map-to-output-decl.h"
 
 typedef struct TabletDriver {
     void (*get_tablet_dimensions)(unsigned int*, unsigned int*, MapToOutputError*);
@@ -12,5 +13,9 @@ typedef struct TabletDriver {
             unsigned int x, unsigned int y, MapToOutputError*);
 
     //return to the default state
-    void (*reset_map_to_output)(MapToOutputError*);
+    //should:
+    //  1. set mapping_mode to NO_MAPPING
+    //  2. free MapToOutput->output_box
+    //  3. set MapToOutput->output_box to NULL
+    void (*reset_map_to_output)(MapToOutput*, MapToOutputError*);
 } TabletDriver;
