@@ -116,7 +116,12 @@ static void make_output_box_lines(
             || bottom_line_points == NULL
             || left_line_points == NULL)
     {
-        //TODO: error
+        static MapToOutputError null_points_error = {
+            .err_type = CANVAS_INIT_ERROR,
+            .err_msg = "gnome_canvas_points_new(2) returned NULL in " __func__ 
+        };
+
+        *err = null_points_error;
     }
 
     output_box_to_lines(output_box, 
@@ -165,7 +170,12 @@ static void make_output_box_lines(
             || output.bottom_line == NULL
             || output.left_line == NULL)
     {
-        //TODO: handle error
+        static MapToOutputError null_item_error = {
+            .err_type = CANVAS_INIT_ERROR,
+            .err_msg = "gnome_canvas_item_new(2) returned NULL in " __func__
+        };
+
+        *err = null_item_error;
     }
 }
 
