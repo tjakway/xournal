@@ -40,7 +40,7 @@ typedef struct MapToOutput {
         top_line, 
         bottom_line;
 
-    gdouble bottom_left_x, bottom_left_y,
+    guint bottom_left_x, bottom_left_y,
             top_right_x, top_right_y;
 } MapToOutput;
 
