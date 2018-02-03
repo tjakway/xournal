@@ -13,6 +13,8 @@ typedef struct MapToOutputConfig {
     //default: red
     guint line_color;
 
+    double line_width_units;
+
     TabletDriver driver;
 } MapToOutputConfig;
 
