@@ -219,7 +219,7 @@ MapToOutput* map_to_output_init(
     if(map_to_output == NULL)
     {
         *err = bad_malloc;
-        return NULL;
+        goto map_to_output_init_error;
     }
 
 
@@ -230,7 +230,8 @@ MapToOutput* map_to_output_init(
             err);
     if(err->err_type != NO_ERROR)
     {
-        return NULL;
+        //if get_tablet_dimensions failed the driver will have set *err
+        goto map_to_output_init_error;
     }
 
 
@@ -258,7 +259,7 @@ MapToOutput* map_to_output_init(
             output_box.top_left_x, output_box.top_left_y, err);
     if(err->err_type != NO_ERROR)
     {
-        return NULL;
+        goto map_to_output_init_error;
     }
     else
     {
@@ -273,7 +274,18 @@ MapToOutput* map_to_output_init(
         //reset the output mapping before returning
         map_to_output->config->driver.reset_map_to_output(map_to_output, NULL);
         
-        return NULL;
+        goto map_to_output_init_error;
     }
 
+    return map_to_output;
+
+map_to_output_init_error:
+    //if we're returning with an error we should have set an error message
+    assert(err->err_type != NO_ERROR);
+
+    if(map_to_output != NULL)
+    {
+        free(map_to_output);
+    }
+    return NULL;
 }
