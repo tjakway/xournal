@@ -16,6 +16,11 @@ struct MapToOutputConfig {
 
     double line_width_units;
 
+    //allowed mismatch between our outlined rect and 
+    //the screen region the driver is mapping output to
+    //(in pixels)
+    guint mapping_allowed_error;
+
     TabletDriver driver;
 };
 
