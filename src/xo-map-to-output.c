@@ -277,6 +277,8 @@ MapToOutput* map_to_output_init(
         goto map_to_output_init_error;
     }
 
+    //run sanity checks before returning
+    map_to_output_asserts(map_to_output);
     return map_to_output;
 
 map_to_output_init_error:
