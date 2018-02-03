@@ -31,6 +31,8 @@ flags = [
 '-isystem',
 '/usr/include/glib-2.0',
 '-isystem',
+'/usr/include/gtk-2.0',
+'-isystem',
 '/usr/local/include',
 ]
 
