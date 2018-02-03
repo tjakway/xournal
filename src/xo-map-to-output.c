@@ -1,6 +1,7 @@
 #include "xo-map-to-output.h"
 
 #include <stdlib.h>
+#include <assert.h>
 
 //TODO: fill in default config
 static MapToOutputConfig default_config;
@@ -189,6 +190,9 @@ static MapToOutput* alloc_map_to_output()
         *map_to_output = (struct MapToOutput){ 0 };
 
         map_to_output->pixels_per_unit = -1.0;
+
+        //no mapping active yet
+        map_to_output->mapping_mode = NO_MAPPING;
     }
     return map_to_output;
 }
@@ -256,13 +260,18 @@ MapToOutput* map_to_output_init(
     {
         return NULL;
     }
+    else
+    {
+        //should have an active mapping after calling the driver
+        assert(map_to_output->mapping_mode == MAPPING_ACTIVE);
+    }
 
     //outline the mapped output box so the user can see it
     make_output_box_lines(map_to_output, output_box, canvas, err);
     if(err->err_type != NO_ERROR)
     {
         //reset the output mapping before returning
-        map_to_output->config->driver.reset_map_to_output(NULL);
+        map_to_output->config->driver.reset_map_to_output(map_to_output, NULL);
         
         return NULL;
     }

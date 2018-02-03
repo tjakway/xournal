@@ -9,6 +9,8 @@ typedef struct TabletDriver {
     //converted to a string of the form WIDTHxHEIGHT+X+Y
     //see https://tronche.com/gui/x/xlib/utilities/XParseGeometry.html
     //for the X11 coordinate system, the origin is the top left and y increases going down
+    //
+    //  **XXX** don't forget to set MapToOutput->mapping_mode to MAPPING_ACTIVE
     void (*map_to_output)(unsigned int width, unsigned int height, 
             unsigned int x, unsigned int y, MapToOutputError*);
 
