@@ -2,10 +2,11 @@
 
 #include <libgnomecanvas/libgnomecanvas.h>
 
+#include "xo-map-to-output-decl.h"
 #include "xo-map-to-output-error.h"
 #include "xo-tablet-driver.h"
 
-typedef struct MapToOutputConfig {
+struct MapToOutputConfig {
     const char* driver_program;
     const char** driver_argv;
     const int driver_argc;
@@ -16,7 +17,7 @@ typedef struct MapToOutputConfig {
     double line_width_units;
 
     TabletDriver driver;
-} MapToOutputConfig;
+};
 
 
 //probably don't need these, just use statically
@@ -27,7 +28,12 @@ typedef struct MapToOutputConfig {
 
 /********************/
 
-typedef struct MapToOutput {
+struct OutputBox {
+    double top_left_x, top_left_y;
+    guint width, height;
+};
+
+struct MapToOutput {
     MapToOutputConfig* config;
 
     GnomeCanvas* canvas;
@@ -42,9 +48,15 @@ typedef struct MapToOutput {
         *top_line, 
         *bottom_line;
 
-    guint bottom_left_x, bottom_left_y,
-            top_right_x, top_right_y;
-} MapToOutput;
+    //NULL if mapping_mode == NO_MAPPING
+    OutputBox* output_box;
+
+    enum MapToOutputMode {
+        NO_MAPPING = 0,
+        MAPPING_ACTIVE
+    } mapping_mode;
+
+};
 
 //pass NULL for default config
 MapToOutput* map_to_output_init(
