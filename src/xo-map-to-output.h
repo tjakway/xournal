@@ -59,7 +59,7 @@ void map_to_output_free(
         MapToOutputError*);
 
 /**
- * if needs_new_page is set to true, call map_to_output_new_page immediately
+ * if needs_new_page is set to true, make a new page and call map_to_output_new_page
  */
 void map_to_output_shift_down(
         MapToOutput*, 
