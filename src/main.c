@@ -23,6 +23,8 @@
 #include <glib/gstdio.h>
 #include <libgnomecanvas/libgnomecanvas.h>
 
+#include <assert.h>
+
 #include "xournal.h"
 #include "xo-interface.h"
 #include "xo-support.h"
@@ -41,6 +43,13 @@ struct UIData ui;   // the user interface data
 struct UndoItem *undo, *redo; // the undo and redo stacks
 
 double DEFAULT_ZOOM;
+
+void print_abs_left_corner()
+{
+  int gdkx = -1, gdky = -1;
+  gdk_window_get_origin(gtk_widget_get_window(GTK_WIDGET(canvas)), &gdkx, &gdky);
+  printf("%s: (%d, %d)\n", __func__, gdkx, gdky);
+}
 
 void init_stuff (int argc, char *argv[])
 {
@@ -181,6 +190,9 @@ void init_stuff (int argc, char *argv[])
           NULL
           );*/
 
+  //width / height
+  double aspect_ratio = 15200.0 / 9500.0; //aka 1.6
+
   GnomeCanvasPoints* points = gnome_canvas_points_new(2);
   points->coords[0] = 0.0;
   points->coords[1] = 0.0;
@@ -196,6 +208,9 @@ void init_stuff (int argc, char *argv[])
           NULL);
 
   gnome_canvas_item_raise_to_top(lineItem);
+
+
+
 
   gtk_widget_show (GTK_WIDGET (canvas));
   w = GET_COMPONENT("scrolledwindowMain");
@@ -309,6 +324,51 @@ void init_stuff (int argc, char *argv[])
   
   gtk_widget_show (winMain);
   update_cursor();
+
+
+  printf("****GDK****\n");
+  int gdkx = -1, gdky = -1;
+  gdk_window_get_origin(gtk_widget_get_window(GTK_WIDGET(canvas)), &gdkx, &gdky);
+  //gtk_widget_translate_coordinates(canvas, gtk_widget_get_toplevel(canvas), 0, 0, &gdkx, &gdky);
+  printf("ABSOLUTE POSITION OF PARENT WINDOW: gdkx: %d, gdky: %d\n", gdkx, gdky);
+  int relx = -1, rely = -1;
+  relx = GTK_WIDGET(canvas)->allocation.x;
+  rely = GTK_WIDGET(canvas)->allocation.y;
+  printf("POSITION RELATIVE TO PARENT: %d, %d\n", relx, rely);
+
+  double itemx, itemy;
+  gnome_canvas_item_i2w(lineItem, &itemx, &itemy);
+  printf("itemx: %f, itemy: %f\n", itemx, itemy);
+    
+  //print the parameters of the page 
+  int px = -1, py = -1, wx = -1, wy = -1;
+  gnome_canvas_w2c(canvas, 0.0, 0.0, &px, &py);
+  gnome_canvas_w2c(canvas, ui.cur_page->width, ui.cur_page->height, &wx, &wy);
+  assert(px >= 0); assert(py >= 0);
+  assert(wx >= 0); assert(wy >= 0);
+
+  double winx, winy;
+  gnome_canvas_world_to_window(canvas, 0.0, 0.0, &winx, &winy);
+  printf("world_to_window X: %f, Y: %f\n", winx, winy);
+  printf("page hoffset: %f, voffset: %f\n", ui.cur_page->hoffset, ui.cur_page->voffset);
+
+  double gx = -1, gy = -1;
+  g_object_get(ui.cur_page->group, 
+          "x", &gx,
+          "y", &gy,
+          NULL);
+  printf("page group x: %f, page group y: %f\n", gx, gy);
+
+  printf("WIDGET WIDTH: %f, HEIGHT: %f\n", GTK_WIDGET(canvas)->allocation.width, GTK_WIDGET(canvas)->allocation.height);
+  printf("PAGE WIDTH: %f, HEIGHT: %f\n", ui.cur_page->width, ui.cur_page->height);
+  printf("PAGE PIXEL COORDINATES:\tTop Left X=%d, Top Left Y=%d\n", px, py);
+  printf("\twidth in pixels converted: %d, %d\n", wx, wy);
+  printf("Pixels per unit (aka zoom factor): %f\n", ui.zoom);
+
+  int scrollx = -1, scrolly = -1;
+  gnome_canvas_get_scroll_offsets(canvas, &scrollx, &scrolly);
+  printf("SCROLL OFFSETS: %d, %d\n", scrollx, scrolly);
+
 
   /* this will cause extension events to get enabled/disabled, but
      we need the windows to be mapped first */
