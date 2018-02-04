@@ -15,12 +15,12 @@ typedef struct MapToOutputError {
 
 
 //TODO: add more error structs
-static MapToOutputError no_error = {
+const MapToOutputError no_error = {
     .err_type = NO_ERROR,
     .err_msg = "Success"
 };
 
-static MapToOutputError bad_malloc = {
+const MapToOutputError bad_malloc = {
     .err_type = BAD_MALLOC,
     .err_msg = "malloc returned NULL"
 };
