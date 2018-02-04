@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glib.h>
+#include <gtk/gtk.h>
 
 #include "xo-map-to-output.h"
 
@@ -9,4 +10,5 @@
 extern MapToOutput* GLOBAL_MAP_TO_OUTPUT;
 G_LOCK_EXTERN(GLOBAL_MAP_TO_OUTPUT);
 
-void map_to_output_on_canvas_button_press();
+void map_to_output_on_canvas_button_press(GtkWidget *widget,
+                                        GdkEventButton *event);
