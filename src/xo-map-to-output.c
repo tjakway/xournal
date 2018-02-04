@@ -1,11 +1,19 @@
 #include "xo-map-to-output.h"
+#include "xo-map-to-output-callbacks.h"
 
 #include <stdlib.h>
 #include <assert.h>
 
-//TODO: fill in default config
-static MapToOutputConfig default_config;
+/**********************/
+/*******GLOBALS********/
+/**********************/
+//allocate the globals forward-declared in xo-map-to-output-callbacks.h
+MapToOutput* GLOBAL_MAP_TO_OUTPUT;
+G_LOCK_DEFINE(GLOBAL_MAP_TO_OUTPUT);
+/**********************/
 
+//TODO: fill in default config
+static const MapToOutputConfig default_config;
 
 
 static OutputBox calculate_output_box(
@@ -279,6 +287,12 @@ MapToOutput* map_to_output_init(
 
     //run sanity checks before returning
     map_to_output_asserts(map_to_output);
+
+    //set up globals
+    G_LOCK(GLOBAL_MAP_TO_OUTPUT);
+    GLOBAL_MAP_TO_OUTPUT = map_to_output;
+    G_UNLOCK(GLOBAL_MAP_TO_OUTPUT);
+
     return map_to_output;
 
 map_to_output_init_error:
