@@ -47,7 +47,6 @@ void print_canvas_drawing_area_dimensions()
         fprintf(stderr, 
                 "MapToOutputError set by %s in %s:"
                 " %s\n", fname, __func__, err.err_msg);
-        return;
     }
     else
     {
