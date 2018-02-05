@@ -73,7 +73,7 @@ void map_to_output_get_canvas_drawing_area_dimensions(
     if(canvas_widget_top_left_x < 0 || canvas_widget_top_left_y < 0)
     {
         static const MapToOutputError gdk_error = {
-            .err_type = GDK_ERROR,
+            .err_type = MAPTOOUTPUT_GDK_ERROR,
             .err_msg = "gdk_window_get_origin returned nonsensical results (x<0 or y<0)"
         };
         *err = gdk_error;
