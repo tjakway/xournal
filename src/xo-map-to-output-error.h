@@ -19,15 +19,5 @@ typedef struct MapToOutputError {
     char* err_msg;
 } MapToOutputError;
 
-
-//TODO: add more error structs
-const MapToOutputError no_error = {
-    .err_type = NO_ERROR,
-    .err_msg = "Success"
-};
-
-const MapToOutputError bad_malloc = {
-    .err_type = BAD_MALLOC,
-    .err_msg = "malloc returned NULL"
-};
-
+extern const MapToOutputError no_error;
+extern const MapToOutputError bad_malloc;
