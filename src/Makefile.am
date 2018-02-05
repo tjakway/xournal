@@ -29,7 +29,8 @@ xournal_SOURCES = \
 	xo-map-to-output.c xo-map-to-output.h \
 	xo-map-to-output-error.h xo-tablet-driver.h \
 	xo-map-to-output-decl.h xo-map-to-output-canvas-functions.h \
-	xo-map-to-output-callbacks.h
+	xo-map-to-output-callbacks.h xo-map-to-output-canvas-functions.c \
+	xo-debug.c
 
 if WIN32
   xournal_LDFLAGS = -mwindows
