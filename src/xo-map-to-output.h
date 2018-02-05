@@ -87,14 +87,11 @@ void map_to_output_new_page(
         MapToOutput*, 
         MapToOutputError*);
 
-/**
- * TODO: this is necessary because we're mapping **screen** pixels to the canvas so we need
- * to resize it such that the same window is shown
- */
-void map_to_output_on_resize(
-        MapToOutput*, 
-        MapToOutputError*);
-
 //sanity checks for MapToOutput
 //uses assert so no need for a MapToOutputError* parameter
 void map_to_output_asserts(MapToOutput*);
+
+//enable/disable MapToOutput functionality
+//should restore regular pointer behavior when disabled
+void map_to_output_enable(gboolean);
+void map_to_output_toggle(gboolean);

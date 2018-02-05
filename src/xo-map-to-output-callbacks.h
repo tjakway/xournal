@@ -12,3 +12,12 @@ G_LOCK_EXTERN(GLOBAL_MAP_TO_OUTPUT);
 
 void map_to_output_on_canvas_button_press(GtkWidget *widget,
                                         GdkEventButton *event);
+
+
+/**
+ * TODO: this is necessary because we're mapping **screen** pixels to the canvas so we need
+ * to resize it such that the same window is shown
+ */
+void map_to_output_on_resize(
+        MapToOutput*, 
+        MapToOutputError*);
