@@ -25,4 +25,8 @@ void map_to_output_scroll_to_mapped_rect(MapToOutput*, MapToOutputError*);
  * (i.e. excluding the non-drawable background area)
  */
 void map_to_output_get_canvas_drawing_area_dimensions(
-        GnomeCanvas*, Page*, gint*, gint*, double*, double*, MapToOutputError*);
+        GnomeCanvas*, Page*, gint*, gint*, double*, double*, 
+        //optional boolean parameter to indicate whether the canvas is larger than our page
+        //pass NULL if you don't care
+        gboolean* no_gap,
+        MapToOutputError*);

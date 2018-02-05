@@ -5,7 +5,12 @@ enum MapToOutputErrorType {
     NO_ERROR = 0,
     BAD_MALLOC,
     DRIVER_GET_TABLET_DIMENSIONS,
-    CANVAS_INIT_ERROR
+    CANVAS_INIT_ERROR,
+    ARG_CHECK_FAILED,
+
+    /** a gdk call failed or returned nonsensical results */
+    GDK_ERROR,
+    WIDGET_DIMENSION_ERROR
 };
 
 typedef struct MapToOutputError {
