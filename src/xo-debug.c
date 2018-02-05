@@ -1,5 +1,6 @@
 #include "xournal.h"
 #include "xo-map-to-output-error.h"
+#include "xo-map-to-output-canvas-functions.h"
 
 #include <stdio.h>
 #include <glib.h>
@@ -36,7 +37,7 @@ void print_canvas_drawing_area_dimensions()
     MapToOutputError err = no_error;
 
     map_to_output_get_canvas_drawing_area_dimensions(
-            canvas, cur_page, zoom,
+            canvas, page, zoom,
             &x, &y, &width, &height,
             &no_gap,
             &err);
@@ -51,6 +52,7 @@ void print_canvas_drawing_area_dimensions()
     else
     {
         printf("%s results: x=%d, y=%d, width=%f, height=%f, no_gap=%s\n",
+                fname, 
                 x, y, width, height,
                 no_gap ? "true" : "false");
     }
