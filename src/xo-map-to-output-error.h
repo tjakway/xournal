@@ -15,7 +15,11 @@ enum MapToOutputErrorType {
 
     //tablet driver errors
     DRIVER_PROGRAM_NOT_FOUND, 
-    NO_DEVICE_FOUND
+    NO_DEVICE_FOUND,
+    MORE_THAN_ONE_DEVICE,
+    RESET_MAP_TO_OUTPUT_FAILED,
+
+    WACOM_REGEX_ERROR
 };
 
 typedef struct MapToOutputError {

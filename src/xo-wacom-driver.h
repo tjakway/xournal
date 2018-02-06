@@ -7,8 +7,12 @@
 #define WACOM_DRIVER "xsetwacom"
 
 typedef struct WacomTabletData {
-    const char* device_name;
+    char* device_name;
 
+    struct WacomParsingRegexes {
+        GRegex* only_whitespace;
+        GRegex* match_stylus;
+    } *p_rgx;
 } WacomTabletData;
 
 
@@ -21,7 +25,10 @@ const MapToOutputError driver_program_not_found = {
 void* init_wacom_driver(MapToOutputError*);
 
 /**
- * parse the result of xsetwacom --list devices or
+ * parse the result of xsetwacom --list devices
  * return the device name or NULL if none is found
+ *
+ * if >1 device is found, MapToOutputErr will be set to MORE_THAN_ONE_DEVICE and
+ * the first one will be returned
  */
-char* wacom_parse_device_name(const char*);
+char* wacom_parse_device_name(void*, const char*, MapToOutputError*);
