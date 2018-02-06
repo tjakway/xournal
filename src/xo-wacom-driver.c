@@ -84,7 +84,12 @@ static void free_parsing_regexes(ParsingRegexes* p_rgx)
 
         free(p_rgx);
     }
+}
 
+static gboolean is_empty_string(ParsingRegexes* p_rgx, const char* str)
+{
+    return g_regex_match(p_rgx->only_whitespace,
+            str,0, NULL);
 }
 
 
