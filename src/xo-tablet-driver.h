@@ -14,11 +14,6 @@ typedef struct TabletDriver {
 
     void (*get_tablet_dimensions)(void*, unsigned int*, unsigned int*, MapToOutputError*);
     
-    /**
-     * return whether or not that device is connected/detected by the driver
-     */
-    gboolean (*has_device)(void*, const char*);
-    
     //converted to a string of the form WIDTHxHEIGHT+X+Y
     //see https://tronche.com/gui/x/xlib/utilities/XParseGeometry.html
     //for the X11 coordinate system, the origin is the top left and y increases going down
