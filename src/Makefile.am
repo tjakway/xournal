@@ -31,7 +31,7 @@ xournal_SOURCES = \
 	xo-tablet-driver.h \
 	xo-map-to-output-decl.h xo-map-to-output-canvas-functions.h \
 	xo-map-to-output-callbacks.h xo-map-to-output-canvas-functions.c \
-	xo-debug.c
+	xo-debug.c xo-wacom-driver.c
 
 if WIN32
   xournal_LDFLAGS = -mwindows

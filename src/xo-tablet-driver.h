@@ -3,6 +3,8 @@
 #include "xo-map-to-output-error.h"
 #include "xo-map-to-output-decl.h"
 
+#include <glib.h>
+
 /**
  * the void* is for the driver to store its data structures
  */
@@ -11,6 +13,11 @@ typedef struct TabletDriver {
     void (*free_driver)(void*, MapToOutputError*);
 
     void (*get_tablet_dimensions)(void*, unsigned int*, unsigned int*, MapToOutputError*);
+    
+    /**
+     * return whether or not that device is connected/detected by the driver
+     */
+    gboolean (*has_device)(void*, const char*);
     
     //converted to a string of the form WIDTHxHEIGHT+X+Y
     //see https://tronche.com/gui/x/xlib/utilities/XParseGeometry.html
