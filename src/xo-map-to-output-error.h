@@ -11,7 +11,11 @@ enum MapToOutputErrorType {
     /** a gdk call failed or returned nonsensical results 
      * can't use GDK_ERROR because it's already defined by GDK... */
     MAPTOOUTPUT_GDK_ERROR,
-    WIDGET_DIMENSION_ERROR
+    WIDGET_DIMENSION_ERROR,
+
+    //tablet driver errors
+    DRIVER_PROGRAM_NOT_FOUND, 
+    NO_DEVICE_FOUND
 };
 
 typedef struct MapToOutputError {
