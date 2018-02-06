@@ -269,6 +269,19 @@ init_wacom_driver_error:
     return NULL;
 }
 
+static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
+{
+    WacomTabletData* wacom_data = (WacomTabletData*)v;
+
+    gint exit_code = -1;
+    GError* gerr_ptr = NULL;
+    const char* cmd = WACOM_DRIVER " --list devices";
+    gboolean res = g_spawn_command_line_sync(cmd,
+            NULL, NULL,
+            &exit_code,
+            &gerr_ptr);
+}
+
 void free_wacom_driver(void* v, MapToOutputError* err)
 {
     WacomTabletData* wacom_data = (WacomTabletData*)v;
