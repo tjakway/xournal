@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 #define ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
 #define MATCH_STYLUS_RGX "[" //TODO
@@ -274,22 +275,41 @@ init_wacom_driver_error:
 static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
 {
     WacomTabletData* wacom_data = (WacomTabletData*)v;
+    if(wacom_data == NULL)
+    {
+        *err = (MapToOutputError){
+            .err_type = RESET_MAP_TO_OUTPUT_FAILED,
+            .err_msg = "passed driver data pointer was NULL"
+        };
+        return;
+    }
 
+
+    //build the command string
+    const size_t cmd_buf_len = 4096;
+    char cmd_buf[cmd_buf_len];
+
+    //TODO: check snprintf return value to make sure the string wasn't too long
+    //...would need a REALLY long device name
+    snprintf(cmd_buf, cmd_buf_len, 
+            "%s --set '%s' MapToOutput desktop",
+            WACOM_DRIVER, wacom_data->device_name);
+
+    //invoke the driver
     gint exit_code = -1;
     GError* gerr_ptr = NULL;
-    const char* cmd = WACOM_DRIVER " --list devices";
-    gboolean res = g_spawn_command_line_sync(cmd,
+    gboolean res = g_spawn_command_line_sync(cmd_buf,
             NULL, NULL,
             &exit_code,
             &gerr_ptr);
 
     if(!res)
     {
-        XO_LOG_GERROR(cmd);
+        XO_LOG_GERROR(cmd_buf);
     }
 }
 
-void free_wacom_driver(void* v, MapToOutputError* err)
+void free_wacom_driver(void* v)
 {
     WacomTabletData* wacom_data = (WacomTabletData*)v;
 

@@ -10,7 +10,7 @@
  */
 typedef struct TabletDriver {
     void* (*init_driver)(MapToOutputError*);
-    void (*free_driver)(void*, MapToOutputError*);
+    void (*free_driver)(void*);
 
     void (*get_tablet_dimensions)(void*, unsigned int*, unsigned int*, MapToOutputError*);
     
@@ -27,7 +27,7 @@ typedef struct TabletDriver {
     //  1. set mapping_mode to NO_MAPPING
     //  2. free MapToOutput->output_box
     //  3. set MapToOutput->output_box to NULL
-    void (*reset_map_to_output)(void*, MapToOutput*, MapToOutputError*);
+    void (*reset_map_to_output)(void*, MapToOutputError*);
 } TabletDriver;
 
 extern const TabletDriver wacom_driver;
