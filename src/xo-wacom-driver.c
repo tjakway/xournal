@@ -1,30 +1,87 @@
+#include "xo-wacom-driver.h"
 #include "xo-tablet-driver.h"
 #include "xo-map-to-output-error.h"
 
 #include <glib.h>
 #include <stdlib.h>
 
+#define ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
+#define MATCH_STYLUS_RGX "[" //TODO
 
-#define WACOM_DRIVER "xsetwacom"
+typedef struct ParsingRegexes {
+    GRegex* only_whitespace;
+    GRegex* match_stylus;
+} ParsingRegexes;
 
-//TODO: delete if we don't use g_spawn_sync()
-static const GSpawnFlags COMMON_FLAGS = G_SPAWN_SEARCH_PATH;
-
-
-static const MapToOutputError driver_program_not_found = {
-    .err_type = DRIVER_PROGRAM_NOT_FOUND,
-    .err_msg = "Could not find tablet driver named " WACOM_DRIVER
-};
-
-
-typedef struct WacomTabletData {
-    const char* device_name;
-
-} WacomTabletData;
-
-static void* init_wacom_driver(MapToOutputError* err)
+static ParsingRegexes* init_parsing_regexes()
 {
-    g_warn_if_fail(err == NULL);
+    ParsingRegexes* p_rgx = malloc(sizeof(ParsingRegexes));
+    if(p_rgx == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        *p_rgx = (ParsingRegexes){NULL, NULL};
+    }
+
+    const GRegexCompileFlags compile_flags = 
+        //match across newlines and make . match newlines
+        G_REGEX_DOTALL | 
+        G_REGEX_MULTILINE |
+        G_REGEX_CASELESS;
+
+
+    GError* err = NULL;
+    p_rgx->only_whitespace = 
+        g_regex_new(
+            ONLY_WHITESPACE_RGX,
+            compile_flags, 0,
+            &err);
+    if(p_rgx->only_whitespace == NULL
+            || err != NULL)
+    {
+        goto init_parsing_regexes_error;
+    }
+
+
+    p_rgx->match_stylus = 
+        g_regex_new(
+                MATCH_STYLUS_RGX,
+                compile_flags, 0,
+                &err);
+
+    if(p_rgx->match_stylus == NULL
+            || err != NULL)
+    {
+        goto init_parsing_regexes_error;
+    }
+
+
+    return p_rgx;
+
+init_parsing_regexes_error:
+    if(p_rgx != NULL)
+    {
+        if(p_rgx->only_whitespace != NULL)
+        {
+            g_regex_unref(p_rgx->only_whitespace);
+        }
+
+        if(p_rgx->match_stylus != NULL)
+        {
+            g_regex_unref(p_rgx->match_stylus);
+        }
+
+        free(p_rgx);
+    }
+    return NULL;
+}
+
+
+void* init_wacom_driver(MapToOutputError* err)
+{
+    g_warn_if_fail(err != NULL);
 
     WacomTabletData* wacom_data = malloc(sizeof(WacomTabletData));
     if(wacom_data == NULL)
@@ -34,6 +91,10 @@ static void* init_wacom_driver(MapToOutputError* err)
             *err = bad_malloc;
         }
         return NULL;
+    }
+    else
+    {
+        *wacom_data = (WacomTabletData){0};
     }
 
     //run xsetwacom and get device names
@@ -93,6 +154,13 @@ init_wacom_driver_error:
         free(stdout_sink);
     }
     return NULL;
+}
+
+
+char* wacom_parse_device_name(const char* xsetwacom_stdout)
+{
+    g_warn_if_fail(xsetwacom_stdout != NULL);
+
 }
 
 
