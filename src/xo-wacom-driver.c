@@ -269,8 +269,10 @@ init_wacom_driver_error:
     return NULL;
 }
 
-static void free_wacom_driver(WacomTabletData* wacom_data)
+void free_wacom_driver(void* v, MapToOutputError* err)
 {
+    WacomTabletData* wacom_data = (WacomTabletData*)v;
+
     if(wacom_data != NULL)
     {
         if(wacom_data->device_name != NULL)
@@ -285,11 +287,14 @@ static void free_wacom_driver(WacomTabletData* wacom_data)
 
         free(wacom_data);
     }
+
+    //TODO: call xsetwacom w/MapToOutput arg "desktop"
 }
 
 /**
  * TODO: fill in fields
  */
 const TabletDriver wacom_driver = {
-    .init_driver = &init_wacom_driver
+    .init_driver = &init_wacom_driver,
+    .free_driver = &free_wacom_driver
 };
