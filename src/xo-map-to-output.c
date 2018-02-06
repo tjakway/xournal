@@ -1,5 +1,6 @@
 #include "xo-map-to-output.h"
 #include "xo-map-to-output-callbacks.h"
+#include "xo-tablet-driver.h"
 
 #include <stdlib.h>
 #include <assert.h>
@@ -12,9 +13,16 @@ MapToOutput* GLOBAL_MAP_TO_OUTPUT;
 G_LOCK_DEFINE(GLOBAL_MAP_TO_OUTPUT);
 /**********************/
 
-//TODO: fill in default config
-static const MapToOutputConfig default_config;
-
+//TODO: fill in default config/keep up to date
+MapToOutputConfig get_default_config()
+{
+    return (MapToOutputConfig){
+        .line_color = 0xFF0000FF,
+        .line_width_units = 10,
+        .mapping_allowed_error = 5,
+        .driver = wacom_driver
+    };
+}
 
 static OutputBox calculate_output_box(
         double top_left_x,
@@ -209,14 +217,12 @@ static MapToOutput* alloc_map_to_output()
 MapToOutput* map_to_output_init(
         MapToOutputConfig* config_param, 
         GnomeCanvas* canvas,
-        guint width,
-        guint height,
         MapToOutputError* err)
 {
     MapToOutputConfig* config;
     if(config_param == NULL)
     {
-        config = &default_config;
+        //TODO
     }
     else
     {
@@ -230,6 +236,7 @@ MapToOutput* map_to_output_init(
         goto map_to_output_init_error;
     }
 
+    map_to_output->config = config;
 
     void* driver_data = map_to_output->config->driver.init_driver(err);
     if(err->err_type != NO_ERROR || driver_data == NULL)
@@ -251,13 +258,16 @@ MapToOutput* map_to_output_init(
     }
 
 
+    const double canvas_width = GTK_WIDGET(canvas)->allocation.width,
+        canvas_height = GTK_WIDGET(canvas)->allocation.height;
+
     gboolean needs_new_page;
     OutputBox output_box = calculate_output_box(
             //blank canvas, therefore a new page
             //so the top left is the origin
             0, 0, 
             //canvas dimensions
-            width, height,
+            canvas_width, canvas_height,
             //tablet dimensions
             map_to_output->tablet_width, map_to_output->tablet_height,
             &needs_new_page);

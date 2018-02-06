@@ -60,7 +60,7 @@ void map_to_output_get_canvas_drawing_area_dimensions(
     //page width and height in pixels
     //the page is embedded in the canvas
     const double page_width_pixels = page->width * zoom,
-          page_height_pixels = page->height * zoom;
+          page_height_pixels = page->height;
 
 
     //we need to get accurate canvas dimensions and coordinates
@@ -105,6 +105,7 @@ void map_to_output_get_canvas_drawing_area_dimensions(
     //optionally tell the caller whether the canvas is larger than our page
     if(no_gap != NULL)
     {
+        //TODO: use margin of error
         if(width_gap == 0)
         {
             *no_gap = TRUE;

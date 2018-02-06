@@ -7,10 +7,6 @@
 #include "xo-tablet-driver.h"
 
 struct MapToOutputConfig {
-    const char* driver_program;
-    const char** driver_argv;
-    const int driver_argc;
-
     //default: red
     guint line_color;
 
@@ -24,6 +20,7 @@ struct MapToOutputConfig {
     TabletDriver driver;
 };
 
+MapToOutputConfig get_default_config();
 
 //probably don't need these, just use statically
 //allocated error structures
@@ -67,8 +64,6 @@ struct MapToOutput {
 MapToOutput* map_to_output_init(
         MapToOutputConfig*, 
         GnomeCanvas*,
-        guint width,
-        guint height,
         MapToOutputError*);
 
 void map_to_output_free(
