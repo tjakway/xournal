@@ -7,7 +7,7 @@ if [[ ! -f "./autogen.sh" ]]; then
     exit 1
 fi
 
-CPP_DEFS="-DDEBUG -DINPUT_DEBUG"
+CPP_DEFS="-DDEBUG " #-DINPUT_DEBUG"
 
 #for some reason this sometimes fails
 make clean distclean \
