@@ -13,6 +13,9 @@ typedef struct ParsingRegexes {
     GRegex* match_stylus;
 } ParsingRegexes;
 
+
+static void free_parsing_regexes(ParsingRegexes*);
+
 static ParsingRegexes* init_parsing_regexes()
 {
     ParsingRegexes* p_rgx = malloc(sizeof(ParsingRegexes));
@@ -41,7 +44,10 @@ static ParsingRegexes* init_parsing_regexes()
     if(p_rgx->only_whitespace == NULL
             || err != NULL)
     {
-        goto init_parsing_regexes_error;
+        //it's safe to call free_parsing_regexes with NULL fields,
+        //it will check appropriately
+        free_parsing_regexes(p_rgx);
+        return NULL;
     }
 
 
@@ -54,13 +60,16 @@ static ParsingRegexes* init_parsing_regexes()
     if(p_rgx->match_stylus == NULL
             || err != NULL)
     {
-        goto init_parsing_regexes_error;
+        free_parsing_regexes(p_rgx);
+        return NULL;
     }
 
 
     return p_rgx;
+}
 
-init_parsing_regexes_error:
+static void free_parsing_regexes(ParsingRegexes* p_rgx)
+{
     if(p_rgx != NULL)
     {
         if(p_rgx->only_whitespace != NULL)
@@ -75,7 +84,7 @@ init_parsing_regexes_error:
 
         free(p_rgx);
     }
-    return NULL;
+
 }
 
 
