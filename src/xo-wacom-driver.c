@@ -11,6 +11,21 @@
 #define MATCH_STYLUS_RGX "[" //TODO
 
 
+#define XO_LOG_GERROR(cmd) do { char* msg; \
+            if(gerr_ptr != NULL) \
+            { \
+                msg = gerr_ptr->message; \
+            } \
+            else \
+            { \
+                msg = "gerr_ptr == NULL, no glib error string available"; \
+            } \
+            g_log(NULL, G_LOG_LEVEL_WARNING, \
+                    "error in %s during call to tablet driver: `%s`, " \
+                    "glib reports error as: %s\n", \
+                    __func__, cmd, msg); \
+            } while(0);
+
 
 static void free_parsing_regexes(struct WacomParsingRegexes*);
 
@@ -216,20 +231,7 @@ void* init_wacom_driver(MapToOutputError* err)
         //otherwise print the warning message
         else
         {
-            char* msg;
-            if(gerr_ptr != NULL)
-            {
-                msg = gerr_ptr->message;
-            }
-            else
-            {
-                msg = "gerr_ptr == NULL, no glib error string available";
-            }
-            g_log(NULL, G_LOG_LEVEL_WARNING, 
-                    "error in %s during call to tablet driver: `%s`, "
-                    "glib reports error as: %s\n",
-                    __func__, cmd, msg);
-
+            XO_LOG_GERROR(cmd);
         }
 
         goto init_wacom_driver_error;
@@ -280,6 +282,11 @@ static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
             NULL, NULL,
             &exit_code,
             &gerr_ptr);
+
+    if(!res)
+    {
+        XO_LOG_GERROR(cmd);
+    }
 }
 
 void free_wacom_driver(void* v, MapToOutputError* err)
