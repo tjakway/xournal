@@ -178,7 +178,17 @@ void* init_wacom_driver(MapToOutputError* err)
     }
     else
     {
-        *wacom_data = (WacomTabletData){0};
+        *wacom_data = (WacomTabletData){0,0};
+    }
+
+    wacom_data->p_rgx = init_parsing_regexes();
+    if(wacom_data->p_rgx == NULL)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_REGEX_ERROR,
+            .err_msg = "Error initializing regex structures for the wacom driver"
+        };
+        goto init_wacom_driver_error;
     }
 
     //run xsetwacom and get device names
@@ -227,17 +237,54 @@ void* init_wacom_driver(MapToOutputError* err)
     else
     {
         //process the driver output
-        //stdout_sink
+        char* device_name = wacom_parse_device_name(wacom_data,
+                stdout_sink, err);
+
+        if(device_name == NULL)
+        {
+            goto init_wacom_driver_error;
+        }
+        else
+        {
+            wacom_data->device_name = device_name;
+        }
+
+
+        return wacom_data;
     }
 
+
 init_wacom_driver_error:
-    free(wacom_data);
+    g_warn_if_reached();
+
+    if(wacom_data != NULL)
+    {
+        free(wacom_data);
+    }
 
     if(stdout_sink != NULL)
     {
         free(stdout_sink);
     }
     return NULL;
+}
+
+static void free_wacom_driver(WacomTabletData* wacom_data)
+{
+    if(wacom_data != NULL)
+    {
+        if(wacom_data->device_name != NULL)
+        {
+            free(wacom_data->device_name);
+        }
+
+        if(wacom_data->p_rgx != NULL)
+        {
+            free_parsing_regexes(wacom_data->p_rgx);
+        }
+
+        free(wacom_data);
+    }
 }
 
 /**
