@@ -31,7 +31,7 @@ static OutputBox calculate_output_box(
     OutputBox output_box;
 
     output_box.width = canvas_width;
-    output_box.height = tablet_aspect_ratio * canvas_height;
+    output_box.height = canvas_width / tablet_aspect_ratio;
     output_box.top_left_x = top_left_x;
     output_box.top_left_y = top_left_y;
 
