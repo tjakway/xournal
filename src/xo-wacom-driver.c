@@ -306,6 +306,11 @@ static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
     if(!res)
     {
         XO_LOG_GERROR(cmd_buf);
+
+        *err = (MapToOutputError){
+            .err_type = RESET_MAP_TO_OUTPUT_FAILED,
+            .err_msg = "xsetwacom call failed"
+        };
     }
 }
 
