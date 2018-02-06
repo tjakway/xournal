@@ -4,28 +4,26 @@
 
 #include <glib.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <string.h>
 
 #define ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
 #define MATCH_STYLUS_RGX "[" //TODO
 
-typedef struct ParsingRegexes {
-    GRegex* only_whitespace;
-    GRegex* match_stylus;
-} ParsingRegexes;
 
 
-static void free_parsing_regexes(ParsingRegexes*);
+static void free_parsing_regexes(struct WacomParsingRegexes*);
 
-static ParsingRegexes* init_parsing_regexes()
+static struct WacomParsingRegexes* init_parsing_regexes()
 {
-    ParsingRegexes* p_rgx = malloc(sizeof(ParsingRegexes));
+    struct WacomParsingRegexes* p_rgx = malloc(sizeof(struct WacomParsingRegexes));
     if(p_rgx == NULL)
     {
         return NULL;
     }
     else
     {
-        *p_rgx = (ParsingRegexes){NULL, NULL};
+        *p_rgx = (struct WacomParsingRegexes){ 0 };
     }
 
     const GRegexCompileFlags compile_flags = 
@@ -68,7 +66,7 @@ static ParsingRegexes* init_parsing_regexes()
     return p_rgx;
 }
 
-static void free_parsing_regexes(ParsingRegexes* p_rgx)
+static void free_parsing_regexes(struct WacomParsingRegexes* p_rgx)
 {
     if(p_rgx != NULL)
     {
@@ -86,10 +84,82 @@ static void free_parsing_regexes(ParsingRegexes* p_rgx)
     }
 }
 
-static gboolean is_empty_string(ParsingRegexes* p_rgx, const char* str)
+static gboolean is_empty_string(struct WacomParsingRegexes* p_rgx, const char* str)
 {
     return g_regex_match(p_rgx->only_whitespace,
             str,0, NULL);
+}
+
+char* wacom_parse_device_name(void* v, const char* str, MapToOutputError* err)
+{
+    g_warn_if_fail(v != NULL); g_warn_if_fail(str != NULL);
+    g_warn_if_fail(err != NULL);
+
+    WacomTabletData* data = (WacomTabletData*)v;
+
+    //can't have a device name if it's empty
+    if(is_empty_string(data->p_rgx, str))
+    {
+        return NULL;
+    }
+    else
+    {
+        char* ret = NULL;
+        GMatchInfo* match = NULL;
+
+        gboolean matched = g_regex_match_all(data->p_rgx->match_stylus, str, 0, &match);
+
+        if(matched)
+        {
+            //TODO: don't forget to free with g_strfreev()
+            gchar** all_matches = g_match_info_fetch_all(match);
+
+            if(all_matches != NULL)
+            {
+                //the gchar** returned by g_match_info_fetch_all is null terminated
+                
+                //count how many matches there are
+                int num_matches = 0;
+                char* this_match = NULL;
+                do {
+                    this_match = all_matches[num_matches];
+
+                    if(this_match != NULL && 
+                            //sanity check
+                            !is_empty_string(data->p_rgx, this_match))
+                    {
+                        num_matches++;
+                    }
+                } while(this_match != NULL);
+
+                //if matched == TRUE we should have at least one match
+                assert(num_matches > 0);
+                
+                //warn the user about >1 match
+                if(num_matches > 1)
+                {
+                    *err = (MapToOutputError) {
+                        .err_type = MORE_THAN_ONE_DEVICE,
+                        .err_msg = "More than one usable device was found in"
+                            " wacom_parse_device_name"
+                    };
+                }
+
+                //use the first match
+                //512 is used as a sanity check
+                const char* first_match = all_matches[0];
+                ret = strndup(first_match, 512);
+
+                //this frees the array AND frees the individual strings
+                //which is why we needed to call strndup
+                g_strfreev(all_matches);
+            }
+        }
+
+        g_match_info_unref(match);
+
+        return ret;
+    }
 }
 
 
@@ -169,14 +239,6 @@ init_wacom_driver_error:
     }
     return NULL;
 }
-
-
-char* wacom_parse_device_name(const char* xsetwacom_stdout)
-{
-    g_warn_if_fail(xsetwacom_stdout != NULL);
-
-}
-
 
 /**
  * TODO: fill in fields
