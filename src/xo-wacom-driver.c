@@ -10,10 +10,6 @@
 //TODO: delete if we don't use g_spawn_sync()
 static const GSpawnFlags COMMON_FLAGS = G_SPAWN_SEARCH_PATH;
 
-/**
- * TODO: init
- */
-const TabletDriver wacom_driver;
 
 static const MapToOutputError driver_program_not_found = {
     .err_type = DRIVER_PROGRAM_NOT_FOUND,
@@ -91,5 +87,18 @@ static void* init_wacom_driver(MapToOutputError* err)
 
 init_wacom_driver_error:
     free(wacom_data);
+
+    if(stdout_sink != NULL)
+    {
+        free(stdout_sink);
+    }
     return NULL;
 }
+
+
+/**
+ * TODO: fill in fields
+ */
+const TabletDriver wacom_driver = {
+    .init_driver = &init_wacom_driver
+};
