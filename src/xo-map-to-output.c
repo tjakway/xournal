@@ -231,8 +231,16 @@ MapToOutput* map_to_output_init(
     }
 
 
+    void* driver_data = map_to_output->config->driver.init_driver(err);
+    if(err->err_type != NO_ERROR || driver_data == NULL)
+    {
+        goto map_to_output_init_error;
+    }
+
+
     //need the tablet dimensions to calculate the aspect ratio
     map_to_output->config->driver.get_tablet_dimensions(
+            driver_data,
             &map_to_output->tablet_width,
             &map_to_output->tablet_height,
             err);
@@ -263,7 +271,9 @@ MapToOutput* map_to_output_init(
 
 
     //call the tablet driver and map the tablet's output to our canvas region
-    map_to_output->config->driver.map_to_output(output_box.width, output_box.height,
+    map_to_output->config->driver.map_to_output(
+            driver_data,
+            output_box.width, output_box.height,
             output_box.top_left_x, output_box.top_left_y, err);
     if(err->err_type != NO_ERROR)
     {
@@ -280,7 +290,7 @@ MapToOutput* map_to_output_init(
     if(err->err_type != NO_ERROR)
     {
         //reset the output mapping before returning
-        map_to_output->config->driver.reset_map_to_output(map_to_output, NULL);
+        map_to_output->config->driver.reset_map_to_output(driver_data, map_to_output, NULL);
         
         goto map_to_output_init_error;
     }
