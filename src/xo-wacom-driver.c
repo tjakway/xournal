@@ -635,8 +635,6 @@ void free_wacom_driver(void* v)
 
         free(wacom_data);
     }
-
-    //TODO: call xsetwacom w/MapToOutput arg "desktop"
 }
 
 /**
@@ -644,5 +642,6 @@ void free_wacom_driver(void* v)
  */
 const TabletDriver wacom_driver = {
     .init_driver = &init_wacom_driver,
-    .free_driver = &free_wacom_driver
+    .free_driver = &free_wacom_driver,
+    .get_tablet_dimensions = &wacom_get_tablet_dimensions
 };
