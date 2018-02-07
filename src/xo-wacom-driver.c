@@ -69,6 +69,7 @@ static int parse_str_to_int(char* to_parse, MapToOutputError* err)
             .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
                 " (nptr == endptr after call to strtoimax)" 
         };
+        return -1;
     }
     else if(res == 0)
     {
@@ -77,6 +78,7 @@ static int parse_str_to_int(char* to_parse, MapToOutputError* err)
             .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
                 " (strtoimax returned 0, indicating nothing to convert)" 
         };
+        return -1;
     }
     //too large or too small to parse into the return type
     else if(res == INTMAX_MAX && errno == ERANGE)
@@ -86,6 +88,7 @@ static int parse_str_to_int(char* to_parse, MapToOutputError* err)
             .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
                 " (integer overflow from strtoimax)" 
         };
+        return -1;
     }
     else if(res == INTMAX_MIN && errno == ERANGE)
     {
@@ -94,6 +97,7 @@ static int parse_str_to_int(char* to_parse, MapToOutputError* err)
             .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
                 " (integer underflow from strtoimax)" 
         };
+        return -1;
     }
     //parsing was successful but the result was too large or too small to store in an int
     else if(res > INT_MAX)
@@ -103,6 +107,7 @@ static int parse_str_to_int(char* to_parse, MapToOutputError* err)
             .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
                 " (returned value >INT_MAX)" 
         };
+        return -1;
     }
     else if(res < INT_MIN)
     {
@@ -111,6 +116,7 @@ static int parse_str_to_int(char* to_parse, MapToOutputError* err)
             .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
                 " (returned value <INT_MIN; also: should not be negative)" 
         };
+        return -1;
     }
     //parsing successful and no overflow/underflow errors
     else
