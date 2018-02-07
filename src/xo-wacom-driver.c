@@ -10,7 +10,7 @@
 
 #define MATCH_ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
 #define MATCH_STYLUS_RGX "^Wacom[\\d\\w\\s]+Pen stylus(?=\\s+id: \\d+\\s+type: STYLUS\\s*$)"
-#define MATCH_TABLET_DIMENSIONS_RGX
+#define MATCH_TABLET_DIMENSIONS_RGX "["
 
 
 #define XO_LOG_GERROR(cmd) do { char* msg; \
