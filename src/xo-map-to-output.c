@@ -300,7 +300,9 @@ MapToOutput* map_to_output_init(
     if(err->err_type != NO_ERROR)
     {
         //reset the output mapping before returning
-        map_to_output->config->driver.reset_map_to_output(driver_data, map_to_output);
+        MapToOutputError reset_err = no_error;
+        map_to_output->config->driver.reset_map_to_output(driver_data, &reset_err);
+        map_to_output_warn_if_error(reset_err);
         
         goto map_to_output_init_error;
     }
