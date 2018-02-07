@@ -10,8 +10,9 @@ typedef struct WacomTabletData {
     char* device_name;
 
     struct WacomParsingRegexes {
-        GRegex* only_whitespace;
-        GRegex* match_stylus;
+        GRegex *match_only_whitespace,
+               *match_stylus,
+               *match_tablet_dimensions;
     } *p_rgx;
 } WacomTabletData;
 

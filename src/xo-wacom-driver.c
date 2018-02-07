@@ -8,8 +8,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#define ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
+#define MATCH_ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
 #define MATCH_STYLUS_RGX "^Wacom[\\d\\w\\s]+Pen stylus(?=\\s+id: \\d+\\s+type: STYLUS\\s*$)"
+#define MATCH_TABLET_DIMENSIONS_RGX
 
 
 #define XO_LOG_GERROR(cmd) do { char* msg; \
@@ -39,7 +40,7 @@ static struct WacomParsingRegexes* init_parsing_regexes()
     }
     else
     {
-        *p_rgx = (struct WacomParsingRegexes){ 0 };
+        *p_rgx = (struct WacomParsingRegexes){ 0,0,0 };
     }
 
     const GRegexCompileFlags compile_flags = 
@@ -50,12 +51,12 @@ static struct WacomParsingRegexes* init_parsing_regexes()
 
 
     GError* err = NULL;
-    p_rgx->only_whitespace = 
+    p_rgx->match_only_whitespace = 
         g_regex_new(
-            ONLY_WHITESPACE_RGX,
+            MATCH_ONLY_WHITESPACE_RGX,
             compile_flags, 0,
             &err);
-    if(p_rgx->only_whitespace == NULL
+    if(p_rgx->match_only_whitespace == NULL
             || err != NULL)
     {
         //it's safe to call free_parsing_regexes with NULL fields,
@@ -78,6 +79,20 @@ static struct WacomParsingRegexes* init_parsing_regexes()
         return NULL;
     }
 
+    p_rgx->match_tablet_dimensions = 
+        g_regex_new(
+                MATCH_TABLET_DIMENSIONS_RGX,
+                compile_flags, 0,
+                &err);
+
+    if(p_rgx->match_tablet_dimensions == NULL
+            || err != NULL)
+    {
+        free_parsing_regexes(p_rgx);
+        return NULL;
+    }
+
+
 
     return p_rgx;
 }
@@ -86,14 +101,19 @@ static void free_parsing_regexes(struct WacomParsingRegexes* p_rgx)
 {
     if(p_rgx != NULL)
     {
-        if(p_rgx->only_whitespace != NULL)
+        if(p_rgx->match_only_whitespace != NULL)
         {
-            g_regex_unref(p_rgx->only_whitespace);
+            g_regex_unref(p_rgx->match_only_whitespace);
         }
 
         if(p_rgx->match_stylus != NULL)
         {
             g_regex_unref(p_rgx->match_stylus);
+        }
+
+        if(p_rgx->match_tablet_dimensions != NULL)
+        {
+            g_regex_unref(p_rgx->match_tablet_dimensions);
         }
 
         free(p_rgx);
@@ -102,7 +122,7 @@ static void free_parsing_regexes(struct WacomParsingRegexes* p_rgx)
 
 static gboolean is_empty_string(struct WacomParsingRegexes* p_rgx, const char* str)
 {
-    return g_regex_match(p_rgx->only_whitespace,
+    return g_regex_match(p_rgx->match_only_whitespace,
             str,0, NULL);
 }
 
