@@ -14,6 +14,9 @@ typedef struct WacomTabletData {
                *match_stylus,
                *match_tablet_dimensions;
     } *p_rgx;
+
+    int dimension_x, dimension_y,
+        dimension_width, dimension_height;
 } WacomTabletData;
 
 

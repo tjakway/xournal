@@ -12,7 +12,7 @@ typedef struct TabletDriver {
     void* (*init_driver)(MapToOutputError*);
     void (*free_driver)(void*);
 
-    void (*get_tablet_dimensions)(void*, unsigned int*, unsigned int*, MapToOutputError*);
+    void (*get_tablet_dimensions)(void*, int*, int*, MapToOutputError*);
     
     //converted to a string of the form WIDTHxHEIGHT+X+Y
     //see https://tronche.com/gui/x/xlib/utilities/XParseGeometry.html
