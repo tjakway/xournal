@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #define ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
-#define MATCH_STYLUS_RGX "[" //TODO
+#define MATCH_STYLUS_RGX "^Wacom[\\d\\w\\s]+Pen stylus(?=\\s+id: \\d+\\s+type: STYLUS\\s*$)"
 
 
 #define XO_LOG_GERROR(cmd) do { char* msg; \
@@ -240,6 +240,8 @@ void* init_wacom_driver(MapToOutputError* err)
     }
     else
     {
+        assert(stdout_sink != NULL);
+
         //process the driver output
         char* device_name = wacom_parse_device_name(wacom_data,
                 stdout_sink, err);
