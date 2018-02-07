@@ -392,7 +392,7 @@ init_wacom_driver_error:
 }
 
 
-static void call_get_tablet_dimensions(void* v,
+static void wacom_get_tablet_dimensions(void* v,
         int* out_x, int* out_y, 
         int* out_width, int* out_height,
         MapToOutputError* err)
