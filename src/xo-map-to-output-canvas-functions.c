@@ -7,7 +7,7 @@
 void map_to_output_get_canvas_drawing_area_dimensions(
         GnomeCanvas* canvas, Page* page, 
         double zoom,
-        gint* dx, gint* dy, 
+        double* dx, double* dy, 
         double* dwidth, double* dheight, 
         gboolean* no_gap,
         MapToOutputError* err)

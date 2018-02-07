@@ -24,7 +24,7 @@ enum MapToOutputErrorType {
 
 typedef struct MapToOutputError {
     enum MapToOutputErrorType err_type;
-    char* err_msg;
+    const char* err_msg;
 } MapToOutputError;
 
 void map_to_output_warn_if_error(MapToOutputError*);
