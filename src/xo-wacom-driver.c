@@ -622,48 +622,6 @@ static void parse_tablet_dimensions(WacomTabletData* wacom_data,
     }
 }
 
-static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
-{
-    WacomTabletData* wacom_data = (WacomTabletData*)v;
-    if(wacom_data == NULL)
-    {
-        *err = (MapToOutputError){
-            .err_type = RESET_MAP_TO_OUTPUT_FAILED,
-            .err_msg = "passed driver data pointer was NULL"
-        };
-        return;
-    }
-
-
-    //build the command string
-    const size_t cmd_buf_len = 4096;
-    char cmd_buf[cmd_buf_len];
-
-    //TODO: check snprintf return value to make sure the string wasn't too long
-    //...would need a REALLY long device name
-    snprintf(cmd_buf, cmd_buf_len, 
-            "%s --set '%s' MapToOutput desktop",
-            WACOM_DRIVER, wacom_data->device_name);
-
-    //invoke the driver
-    gint exit_code = -1;
-    GError* gerr_ptr = NULL;
-    gboolean res = g_spawn_command_line_sync(cmd_buf,
-            NULL, NULL,
-            &exit_code,
-            &gerr_ptr);
-
-    if(!res)
-    {
-        XO_LOG_GERROR(cmd_buf);
-
-        *err = (MapToOutputError){
-            .err_type = RESET_MAP_TO_OUTPUT_FAILED,
-            .err_msg = "xsetwacom call failed"
-        };
-    }
-}
-
 void free_wacom_driver(void* v)
 {
     WacomTabletData* wacom_data = (WacomTabletData*)v;
