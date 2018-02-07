@@ -693,6 +693,9 @@ static void wacom_get_tablet_dimensions(void* v,
         int* out_w, int* out_h, 
         MapToOutputError* err)
 {
+    //we already saved the tablet dimensions in our init function,
+    //just write them out to the passed pointers
+    
     WacomTabletData* wacom_data = (WacomTabletData*)v;
     g_warn_if_fail(wacom_data != NULL);
     g_warn_if_fail(out_w != NULL);
