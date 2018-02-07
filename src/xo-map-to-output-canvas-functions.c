@@ -82,13 +82,14 @@ void map_to_output_get_canvas_drawing_area_dimensions(
 
     //the width of the canvas widget in pixels
     //!!__which may be larger than our page__!!
-    const gint canvas_width_pixels = GTK_WIDGET(canvas)->allocation.width,
-         canvas_height_pixels = GTK_WIDGET(canvas)->allocation.height;
+    const double canvas_width_pixels = (double)GTK_WIDGET(canvas)->allocation.width,
+         canvas_height_pixels = (double)GTK_WIDGET(canvas)->allocation.height;
 
     assert(canvas_width_pixels > 0);
     assert(canvas_height_pixels > 0);
 
     //the canvas shouldn't be taller than the page
+    //TODO: use margin of error
     if(canvas_height_pixels != page_height_pixels)
     {
         static const MapToOutputError w_err = {
