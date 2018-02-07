@@ -179,7 +179,7 @@ static struct WacomParsingRegexes* init_parsing_regexes()
         g_regex_new(
                 MATCH_TABLET_DIMENSIONS_RGX,
                 //don't need multiline for this one
-                compile_flags & ~G_REGEX_MULTILINE, 
+                G_REGEX_DOTALL | G_REGEX_CASELESS,
                 0,
                 &err);
 
