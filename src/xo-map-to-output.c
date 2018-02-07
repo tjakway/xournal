@@ -13,7 +13,7 @@ MapToOutput* GLOBAL_MAP_TO_OUTPUT;
 G_LOCK_DEFINE(GLOBAL_MAP_TO_OUTPUT);
 /**********************/
 
-//TODO: fill in default config/keep up to date
+//TODO: keep up to date
 MapToOutputConfig get_default_config()
 {
     return (MapToOutputConfig){
