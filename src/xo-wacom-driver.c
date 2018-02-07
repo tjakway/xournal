@@ -392,16 +392,23 @@ init_wacom_driver_error:
 }
 
 
-static void call_get_tablet_dimensions(WacomTabletData* wacom_data,
-        int* out_x, int* out_y, MapToOutputError* err)
+static void call_get_tablet_dimensions(void* v,
+        int* out_x, int* out_y, 
+        int* out_width, int* out_height,
+        MapToOutputError* err)
 {
+    WacomTabletData* wacom_data = (WacomTabletData*)v;
+
+    //warn if bad parameters are passed
     g_warn_if_fail(wacom_data != NULL);
     g_warn_if_fail(out_x != NULL);
     g_warn_if_fail(out_y != NULL);
+    g_warn_if_fail(out_width != NULL);
+    g_warn_if_fail(out_height != NULL);
     g_warn_if_fail(err != NULL);
 
-    GMatchInfo* match = NULL;
 
+    //give bad return values if the tablet driver pointer is bad
     if(wacom_data == NULL)
     {
         if(out_x != NULL)
@@ -412,9 +419,18 @@ static void call_get_tablet_dimensions(WacomTabletData* wacom_data,
         {
             *out_y = -1;
         }
+        if(out_width != NULL)
+        {
+            *out_width = -1;
+        }
+        if(out_height != NULL)
+        {
+            *out_height = -1;
+        }
     }
 
 
+    //call the tablet driver
     gint exit_code = -1;
     GError* gerr_ptr = NULL;
     gchar* stdout_sink = NULL;
@@ -450,6 +466,12 @@ static void call_get_tablet_dimensions(WacomTabletData* wacom_data,
     }
     else
     {
+        //parse the output
+        //any errors will be written directly into err
+        parse_tablet_dimensions(wacom_data,
+                stdout_sink,
+                out_x, out_y, out_width, out_height,
+                err);
     }
 }
 
