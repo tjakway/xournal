@@ -22,11 +22,6 @@ struct MapToOutputConfig {
 
 MapToOutputConfig get_default_config();
 
-//probably don't need these, just use statically
-//allocated error structures
-//MapToOutputError* map_to_output_err_new();
-//void map_to_output_err_free(MapToOutputError*);
-
 
 /********************/
 
