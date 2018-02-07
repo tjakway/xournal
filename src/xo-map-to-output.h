@@ -20,7 +20,7 @@ struct MapToOutputConfig {
     TabletDriver driver;
 };
 
-MapToOutputConfig get_default_config();
+MapToOutputConfig get_default_config(void);
 
 
 /********************/
