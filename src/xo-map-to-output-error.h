@@ -20,7 +20,9 @@ enum MapToOutputErrorType {
     RESET_MAP_TO_OUTPUT_FAILED,
 
     WACOM_REGEX_ERROR,
-    WACOM_GET_AREA_ERROR
+    WACOM_GET_AREA_ERROR,
+    WACOM_GET_AREA_PARSING_ERROR,
+    WACOM_BAD_DIMENSIONS
 };
 
 typedef struct MapToOutputError {

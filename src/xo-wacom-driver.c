@@ -49,6 +49,16 @@ static void parse_tablet_dimensions(WacomTabletData* wacom_data,
         int* out_width, int* out_height,
         MapToOutputError* err);
 
+static void run_and_parse_tablet_dimensions(
+        WacomTabletData* wacom_data,
+        int* out_x, int* out_y, 
+        int* out_width, int* out_height,
+        MapToOutputError* err);
+
+WacomTabletData* init_wacom_tablet_data(MapToOutputError* err);
+void wacom_get_device_name(WacomTabletData* wacom_data,
+        MapToOutputError* err);
+
 /**
  * parse a string to an int and store any errors in the
  * MapToOutputError pointer
@@ -294,39 +304,46 @@ char* wacom_parse_device_name(void* v, const char* str, MapToOutputError* err)
     }
 }
 
+void process_tablet_dimensions(
+        WacomTabletData* wacom_data,
+        MapToOutputError* err)
+{
+    run_and_parse_tablet_dimensions(wacom_data,
+            &wacom_data->dimension_x,
+            &wacom_data->dimension_y,
+            &wacom_data->dimension_width,
+            &wacom_data->dimension_height,
+            err);
+}
 
 void* init_wacom_driver(MapToOutputError* err)
 {
-    g_warn_if_fail(err != NULL);
+    WacomTabletData* wacom_data = init_wacom_tablet_data(err);
 
-    WacomTabletData* wacom_data = malloc(sizeof(WacomTabletData));
-    if(wacom_data == NULL)
+    wacom_get_device_name(wacom_data, err);
+    if(err->err_type != NO_ERROR)
     {
-        if(err != NULL)
-        {
-            *err = bad_malloc;
-        }
+        free(wacom_data);
         return NULL;
     }
-    else
+
+    process_tablet_dimensions(wacom_data, err);
+    if(err->err_type != NO_ERROR)
     {
-        *wacom_data = (WacomTabletData){0,0};
+        free(wacom_data);
+        return NULL;
     }
 
-    gchar* stdout_sink = NULL;
+    return (void*)wacom_data;
+}
 
-    wacom_data->p_rgx = init_parsing_regexes();
-    if(wacom_data->p_rgx == NULL)
-    {
-        *err = (MapToOutputError){
-            .err_type = WACOM_REGEX_ERROR,
-            .err_msg = "Error initializing regex structures for the wacom driver"
-        };
-        goto init_wacom_driver_error;
-    }
+
+void wacom_get_device_name(WacomTabletData* wacom_data,
+        MapToOutputError* err)
+{
+    gchar* stdout_sink;
 
     //run xsetwacom and get device names
-    //TODO: double check how I'm supposed to get stdout back...
     gint exit_code = -1;
     GError* gerr_ptr = NULL;
     const char* cmd = WACOM_DRIVER " --list devices";
@@ -351,8 +368,6 @@ void* init_wacom_driver(MapToOutputError* err)
         {
             XO_LOG_GERROR(cmd);
         }
-
-        goto init_wacom_driver_error;
     }
     else
     {
@@ -364,17 +379,54 @@ void* init_wacom_driver(MapToOutputError* err)
 
         if(device_name == NULL)
         {
-            goto init_wacom_driver_error;
+            *err = (MapToOutputError){
+                .err_type = NO_DEVICE_FOUND,
+                .err_msg = "No device found in output of "
+                    WACOM_DRIVER " --list devices"
+            };
         }
         else
         {
             wacom_data->device_name = device_name;
         }
-
-
-        return wacom_data;
     }
 
+    if(stdout_sink != NULL)
+    {
+        free(stdout_sink);
+    }
+}
+
+WacomTabletData* init_wacom_tablet_data(MapToOutputError* err)
+{
+    g_warn_if_fail(err != NULL);
+
+    WacomTabletData* wacom_data = malloc(sizeof(WacomTabletData));
+    if(wacom_data == NULL)
+    {
+        if(err != NULL)
+        {
+            *err = bad_malloc;
+        }
+        return NULL;
+    }
+    else
+    {
+        *wacom_data = (WacomTabletData){0,0,0,0,0,0};
+    }
+
+    wacom_data->p_rgx = init_parsing_regexes();
+    if(wacom_data->p_rgx == NULL)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_REGEX_ERROR,
+            .err_msg = "Error initializing regex structures for the wacom driver"
+        };
+        goto init_wacom_driver_error;
+    }
+
+
+    return wacom_data;
 
 init_wacom_driver_error:
     g_warn_if_reached();
@@ -384,21 +436,16 @@ init_wacom_driver_error:
         free(wacom_data);
     }
 
-    if(stdout_sink != NULL)
-    {
-        free(stdout_sink);
-    }
     return NULL;
 }
 
 
-static void wacom_get_tablet_dimensions(void* v,
+static void run_and_parse_tablet_dimensions(
+        WacomTabletData* wacom_data,
         int* out_x, int* out_y, 
         int* out_width, int* out_height,
         MapToOutputError* err)
 {
-    WacomTabletData* wacom_data = (WacomTabletData*)v;
-
     //warn if bad parameters are passed
     g_warn_if_fail(wacom_data != NULL);
     g_warn_if_fail(out_x != NULL);
@@ -472,6 +519,11 @@ static void wacom_get_tablet_dimensions(void* v,
                 stdout_sink,
                 out_x, out_y, out_width, out_height,
                 err);
+    }
+
+    if(stdout_sink != NULL)
+    {
+        free(stdout_sink);
     }
 }
 
@@ -634,6 +686,37 @@ void free_wacom_driver(void* v)
         }
 
         free(wacom_data);
+    }
+}
+
+static void wacom_get_tablet_dimensions(void* v, 
+        int* out_w, int* out_h, 
+        MapToOutputError* err)
+{
+    WacomTabletData* wacom_data = (WacomTabletData*)v;
+    g_warn_if_fail(wacom_data != NULL);
+    g_warn_if_fail(out_w != NULL);
+    g_warn_if_fail(out_h != NULL);
+    g_warn_if_fail(err != NULL);
+
+    if(wacom_data->dimension_width <= 0 || 
+            wacom_data->dimension_height <= 0)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_BAD_DIMENSIONS,
+            .err_msg = "Error in wacom_get_tablet_dimensions: "
+                "dimension_width or dimension_height was <= 0,"
+                " probably due to an error in init_wacom_driver"
+        };
+    }
+
+    if(out_w != NULL)
+    {
+        *out_w = wacom_data->dimension_width;
+    }
+    if(out_h != NULL)
+    {
+        *out_h = wacom_data->dimension_height;
     }
 }
 
