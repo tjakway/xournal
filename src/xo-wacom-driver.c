@@ -197,6 +197,8 @@ void* init_wacom_driver(MapToOutputError* err)
         *wacom_data = (WacomTabletData){0,0};
     }
 
+    gchar* stdout_sink = NULL;
+
     wacom_data->p_rgx = init_parsing_regexes();
     if(wacom_data->p_rgx == NULL)
     {
@@ -209,7 +211,6 @@ void* init_wacom_driver(MapToOutputError* err)
 
     //run xsetwacom and get device names
     //TODO: double check how I'm supposed to get stdout back...
-    gchar* stdout_sink = NULL;
     gint exit_code = -1;
     GError* gerr_ptr = NULL;
     const char* cmd = WACOM_DRIVER " --list devices";
