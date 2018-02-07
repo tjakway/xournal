@@ -135,6 +135,25 @@ static gboolean is_empty_string(struct WacomParsingRegexes* p_rgx, const char* s
             str,0, NULL);
 }
 
+static int get_num_matches(WacomTabletData* wacom_data, char** all_matches)
+{
+    int num_matches = 0;
+    char* this_match = NULL;
+    do {
+        this_match = all_matches[num_matches];
+
+        if(this_match != NULL && 
+            //sanity check
+            !is_empty_string(wacom_data->p_rgx, this_match))
+        {
+            num_matches++;
+        }
+    } while(this_match != NULL);
+
+    return num_matches;
+}
+
+
 char* wacom_parse_device_name(void* v, const char* str, MapToOutputError* err)
 {
     g_warn_if_fail(v != NULL); g_warn_if_fail(str != NULL);
@@ -165,17 +184,7 @@ char* wacom_parse_device_name(void* v, const char* str, MapToOutputError* err)
                 
                 //count how many matches there are
                 int num_matches = 0;
-                char* this_match = NULL;
-                do {
-                    this_match = all_matches[num_matches];
-
-                    if(this_match != NULL && 
-                            //sanity check
-                            !is_empty_string(data->p_rgx, this_match))
-                    {
-                        num_matches++;
-                    }
-                } while(this_match != NULL);
+                num_matches = get_num_matches(data, all_matches);
 
                 //if matched == TRUE we should have at least one match
                 assert(num_matches > 0);
@@ -304,6 +313,7 @@ init_wacom_driver_error:
     return NULL;
 }
 
+
 static void parse_tablet_dimensions(WacomTabletData* wacom_data,
         int* out_x, int* out_y, MapToOutputError* err)
 {
@@ -312,9 +322,18 @@ static void parse_tablet_dimensions(WacomTabletData* wacom_data,
     g_warn_if_fail(out_y != NULL);
     g_warn_if_fail(err != NULL);
 
+    GMatchInfo* match = NULL;
+
     if(wacom_data == NULL)
     {
-        goto parse_tablet_dimensions_error;
+        if(out_x != NULL)
+        {
+            *out_x = -1;
+        }
+        if(out_y != NULL)
+        {
+            *out_y = -1;
+        }
     }
 
 
@@ -345,18 +364,9 @@ static void parse_tablet_dimensions(WacomTabletData* wacom_data,
     }
     else
     {
-
+        if(all_matches != NULL)
     }
 
-parse_tablet_dimensions_error:
-    if(out_x != NULL)
-    {
-        *out_x = -1;
-    }
-    if(out_y != NULL)
-    {
-        *out_y = -1;
-    }
 }
 
 static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
