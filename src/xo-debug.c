@@ -1,3 +1,4 @@
+#include "xo-debug.h"
 #include "xournal.h"
 #include "xo-map-to-output-error.h"
 #include "xo-map-to-output-canvas-functions.h"

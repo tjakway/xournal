@@ -35,6 +35,9 @@
 #include "xo-shapes.h"
 #include "xo-map-to-output.h"
 
+#include "xo-debug.h"
+
+
 GtkWidget *winMain;
 GnomeCanvas *canvas;
 
@@ -415,6 +418,9 @@ void init_stuff (int argc, char *argv[])
   MapToOutputError err = no_error;
   MapToOutputConfig default_config = get_default_config();
   MapToOutput* map_to_output = map_to_output_init(&default_config, canvas, &err);
+
+    print_canvas_w2c_affine_matrix();
+
 
   // and finally, open a file specified on the command line
   // (moved here because display parameters weren't initialized yet...)
