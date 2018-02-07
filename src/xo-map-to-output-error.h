@@ -27,5 +27,7 @@ typedef struct MapToOutputError {
     char* err_msg;
 } MapToOutputError;
 
+void map_to_output_warn_if_error(MapToOutputError*);
+
 extern const MapToOutputError no_error;
 extern const MapToOutputError bad_malloc;
