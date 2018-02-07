@@ -1,4 +1,5 @@
 #include "xo-wacom-driver.h"
+#include "xo-map-to-output.h"
 #include "xo-tablet-driver.h"
 #include "xo-map-to-output-error.h"
 
@@ -724,6 +725,8 @@ static void wacom_get_tablet_dimensions(void* v,
 }
 
 
+//does the actual call to set MapToOutput, abstracted over whether we're
+//resetting it or not
 static void call_map_to_output(
         WacomTabletData* wacom_data,
         unsigned int x,
@@ -775,11 +778,60 @@ static void call_map_to_output(
     }
 }
 
-/**
- * TODO: fill in fields
- */
+static void wacom_map_to_output(void* v,  
+        MapToOutput* map_to_output,
+        unsigned int x, unsigned int y,
+        unsigned int width, unsigned int height,
+        MapToOutputError* err)
+{
+    g_warn_if_fail(v != NULL);
+    g_warn_if_fail(map_to_output != NULL);
+    g_warn_if_fail(err != NULL);
+
+    //only call the driver if we haven't already encountered an error
+    //otherwise we might not realize there was an error in call_map_to_output
+    //and make mapping_mode harder to track
+    if(err->err_type == NO_ERROR)
+    {
+        WacomTabletData* wacom_data = (WacomTabletData*)v;
+
+        call_map_to_output(wacom_data, x, y, width, height, err, FALSE);
+
+        if(err->err_type == NO_ERROR)
+        {
+            map_to_output->mapping_mode = MAPPING_ACTIVE;
+        }
+    }
+}
+
+
+static void wacom_reset_map_to_output(void* v, 
+        MapToOutput* map_to_output, 
+        MapToOutputError* err)
+{
+    g_warn_if_fail(v != NULL);
+    g_warn_if_fail(map_to_output != NULL);
+    g_warn_if_fail(err != NULL);
+
+    WacomTabletData* wacom_data = (WacomTabletData*)v;
+
+    if(err->err_type == NO_ERROR)
+    {
+        //parameters are ignored when reset == TRUE
+        call_map_to_output(wacom_data, 0, 0, 0, 0, err, TRUE);
+
+        if(err->err_type == NO_ERROR)
+        {
+            map_to_output->mapping_mode = NO_MAPPING;
+        }
+    }
+}
+
+
 const TabletDriver wacom_driver = {
     .init_driver = &init_wacom_driver,
     .free_driver = &free_wacom_driver,
-    .get_tablet_dimensions = &wacom_get_tablet_dimensions
+    .get_tablet_dimensions = &wacom_get_tablet_dimensions,
+    .map_to_output = &wacom_map_to_output,
+    .reset_map_to_output = &wacom_reset_map_to_output
 };
