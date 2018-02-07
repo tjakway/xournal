@@ -17,7 +17,11 @@ make clean distclean \
 find . -name '*.o' -type f -delete
 find src/ -name "xournal" -type f -executable -delete
 
-CFLAGS="-g -O0 $CPP_DEFS" ./autogen.sh --enable-maintainer-mode
+BASIC_DEBUG_FLAGS="-g -O0"
+
+#set cflags to -g -O0 if it's unset or empty
+#leave it as-is if it's nonempty
+CFLAGS="${CFLAGS:?$BASIC_DEBUG_FLAGS}" ./autogen.sh --enable-maintainer-mode
 
 NPROC=$(nproc)
 make "-j$NPROC"
