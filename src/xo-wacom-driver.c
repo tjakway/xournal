@@ -8,9 +8,16 @@
 #include <string.h>
 #include <stdio.h>
 
+/**
+ * Some notes about the wacom driver (xsetwacom):
+ *  -MapToOutput is a write-only property that cannot be queried with xsetwacom --get
+ *  -The format of Area is "x y width height"
+ *
+ */
+
 #define MATCH_ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
 #define MATCH_STYLUS_RGX "^Wacom[\\d\\w\\s]+Pen stylus(?=\\s+id: \\d+\\s+type: STYLUS\\s*$)"
-#define MATCH_TABLET_DIMENSIONS_RGX "["
+#define MATCH_TABLET_DIMENSIONS_RGX "^(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*$"
 
 
 #define XO_LOG_GERROR(cmd) do { char* msg; \
