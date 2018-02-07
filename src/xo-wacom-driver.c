@@ -699,6 +699,15 @@ static void wacom_get_tablet_dimensions(void* v,
     if(wacom_data->dimension_width <= 0 || 
             wacom_data->dimension_height <= 0)
     {
+        if(out_w != NULL)
+        {
+            *out_w = wacom_data->dimension_width;
+        }
+        if(out_h != NULL)
+        {
+            *out_h = wacom_data->dimension_height;
+        }
+
         *err = (MapToOutputError){
             .err_type = WACOM_BAD_DIMENSIONS,
             .err_msg = "Error in wacom_get_tablet_dimensions: "
@@ -706,15 +715,25 @@ static void wacom_get_tablet_dimensions(void* v,
                 " probably due to an error in init_wacom_driver"
         };
     }
-
-    if(out_w != NULL)
+    else
     {
+        //do the actual assignment
         *out_w = wacom_data->dimension_width;
-    }
-    if(out_h != NULL)
-    {
         *out_h = wacom_data->dimension_height;
     }
+}
+
+
+static void call_map_to_output(
+        WacomTabletData* wacom_data,
+        unsigned int x,
+        unsigned int y,
+        unsigned int width,
+        unsigned int height,
+        MapToOutputError* err,
+        gboolean reset)
+{
+
 }
 
 /**
