@@ -19,7 +19,8 @@ enum MapToOutputErrorType {
     MORE_THAN_ONE_DEVICE,
     RESET_MAP_TO_OUTPUT_FAILED,
 
-    WACOM_REGEX_ERROR
+    WACOM_REGEX_ERROR,
+    WACOM_GET_AREA_ERROR
 };
 
 typedef struct MapToOutputError {

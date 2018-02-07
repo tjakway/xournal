@@ -89,7 +89,9 @@ static struct WacomParsingRegexes* init_parsing_regexes()
     p_rgx->match_tablet_dimensions = 
         g_regex_new(
                 MATCH_TABLET_DIMENSIONS_RGX,
-                compile_flags, 0,
+                //don't need multiline for this one
+                compile_flags & ~G_REGEX_MULTILINE, 
+                0,
                 &err);
 
     if(p_rgx->match_tablet_dimensions == NULL
@@ -312,19 +314,49 @@ static void parse_tablet_dimensions(WacomTabletData* wacom_data,
 
     if(wacom_data == NULL)
     {
-        *out_x = -1;
-        *out_y = -1;
+        goto parse_tablet_dimensions_error;
     }
 
 
     gint exit_code = -1;
     GError* gerr_ptr = NULL;
-    const char* cmd = WACOM_DRIVER " --list devices";
-    gboolean res = g_spawn_command_line_sync(cmd,
+    gchar* stdout_sink = NULL;
+
+    const int cmd_buf_len = 2048;
+    char cmd_buf[cmd_buf_len];
+
+    snprintf(cmd_buf, cmd_buf_len, "%s --get %s Area",
+            WACOM_DRIVER, wacom_data->device_name);
+
+    gboolean res = g_spawn_command_line_sync(cmd_buf,
             &stdout_sink,
             NULL,
             &exit_code,
             &gerr_ptr);
+
+    if(!res)
+    {
+        XO_LOG_GERROR(cmd_buf);
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_ERROR,
+            .err_msg = "call to xsetwacom --get <device_name>"
+                " Area failed with nonzero exit code"
+        };
+    }
+    else
+    {
+
+    }
+
+parse_tablet_dimensions_error:
+    if(out_x != NULL)
+    {
+        *out_x = -1;
+    }
+    if(out_y != NULL)
+    {
+        *out_y = -1;
+    }
 }
 
 static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
