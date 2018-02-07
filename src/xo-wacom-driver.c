@@ -733,7 +733,46 @@ static void call_map_to_output(
         MapToOutputError* err,
         gboolean reset)
 {
+    const int cmd_buf_len = 2048;
+    char cmd_buf[cmd_buf_len];
 
+    //reset the output mapping using the special string "desktop"
+    if(reset)
+    {
+        snprintf(cmd_buf, cmd_buf_len, 
+                "%s --set %s MapToOutput desktop",
+                WACOM_DRIVER, wacom_data->device_name);
+    }
+    //create a new mapping, overwriting the old one
+    else
+    {
+        //WARNING: it's easy to mix up X11 geometry strings...
+        //the format is WIDTHxHEIGHT+X+Y
+        //DO NOT PUT X AND Y FIRST!
+        snprintf(cmd_buf, cmd_buf_len, 
+                "%s --set %s MapToOutput desktop %ux%u+%u+%u",
+                WACOM_DRIVER, wacom_data->device_name,
+                width, height, x, y);
+    }
+
+    gint exit_code = -1;
+    GError* gerr_ptr = NULL;
+
+    gboolean res = g_spawn_command_line_sync(cmd_buf,
+            NULL,
+            NULL,
+            &exit_code,
+            &gerr_ptr);
+
+    if(!res)
+    {
+        XO_LOG_GERROR(cmd_buf);
+        *err = (MapToOutputError){
+            .err_type = WACOM_CALL_MAP_TO_OUTPUT_ERROR,
+            .err_msg = "Call to xsetwacom to set MapToOutput parameter failed"
+                " with nonzero exit code"
+        };
+    }
 }
 
 /**
