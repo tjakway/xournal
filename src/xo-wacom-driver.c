@@ -295,6 +295,31 @@ init_wacom_driver_error:
     return NULL;
 }
 
+static void parse_tablet_dimensions(WacomTabletData* wacom_data,
+        int* out_x, int* out_y, MapToOutputError* err)
+{
+    g_warn_if_fail(wacom_data != NULL);
+    g_warn_if_fail(out_x != NULL);
+    g_warn_if_fail(out_y != NULL);
+    g_warn_if_fail(err != NULL);
+
+    if(wacom_data == NULL)
+    {
+        *out_x = -1;
+        *out_y = -1;
+    }
+
+
+    gint exit_code = -1;
+    GError* gerr_ptr = NULL;
+    const char* cmd = WACOM_DRIVER " --list devices";
+    gboolean res = g_spawn_command_line_sync(cmd,
+            &stdout_sink,
+            NULL,
+            &exit_code,
+            &gerr_ptr);
+}
+
 static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
 {
     WacomTabletData* wacom_data = (WacomTabletData*)v;
