@@ -8,6 +8,10 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <limits.h>
+#include <errno.h>
+#include <inttypes.h> //for strtoimax, C99+ only
+
 /**
  * Some notes about the wacom driver (xsetwacom):
  *  -MapToOutput is a write-only property that cannot be queried with xsetwacom --get
@@ -18,6 +22,7 @@
 #define MATCH_ONLY_WHITESPACE_RGX "/\\A\\s*\\z/"
 #define MATCH_STYLUS_RGX "^Wacom[\\d\\w\\s]+Pen stylus(?=\\s+id: \\d+\\s+type: STYLUS\\s*$)"
 #define MATCH_TABLET_DIMENSIONS_RGX "^(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*$"
+#define MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS 4
 
 
 #define XO_LOG_GERROR(cmd) do { char* msg; \
@@ -37,6 +42,79 @@
 
 
 static void free_parsing_regexes(struct WacomParsingRegexes*);
+
+static void parse_tablet_dimensions(WacomTabletData* wacom_data,
+        const char* str,
+        int* out_x, int* out_y, 
+        int* out_width, int* out_height,
+        MapToOutputError* err);
+
+/**
+ * parse a string to an int and store any errors in the
+ * MapToOutputError pointer
+ */
+static int parse_str_to_int(char* to_parse, MapToOutputError* err)
+{
+    char* endptr = NULL;
+    intmax_t res = strtoimax(to_parse, &endptr, 10);
+    if(endptr == to_parse)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_PARSING_ERROR,
+            .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                " (nptr == endptr after call to strtoimax)" 
+        };
+    }
+    else if(res == 0)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_PARSING_ERROR,
+            .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                " (strtoimax returned 0, indicating nothing to convert)" 
+        };
+    }
+    //too large or too small to parse into the return type
+    else if(res == INTMAX_MAX && errno == ERANGE)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_PARSING_ERROR,
+            .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                " (integer overflow from strtoimax)" 
+        };
+    }
+    else if(res == INTMAX_MIN && errno == ERANGE)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_PARSING_ERROR,
+            .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                " (integer underflow from strtoimax)" 
+        };
+    }
+    //parsing was successful but the result was too large or too small to store in an int
+    else if(res > INT_MAX)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_PARSING_ERROR,
+            .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                " (returned value >INT_MAX)" 
+        };
+    }
+    else if(res < INT_MIN)
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_PARSING_ERROR,
+            .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                " (returned value <INT_MIN; also: should not be negative)" 
+        };
+    }
+    //parsing successful and no overflow/underflow errors
+    else
+    {
+        return (int)res;
+    }
+}
+
+
 
 static struct WacomParsingRegexes* init_parsing_regexes()
 {
@@ -314,7 +392,7 @@ init_wacom_driver_error:
 }
 
 
-static void parse_tablet_dimensions(WacomTabletData* wacom_data,
+static void call_get_tablet_dimensions(WacomTabletData* wacom_data,
         int* out_x, int* out_y, MapToOutputError* err)
 {
     g_warn_if_fail(wacom_data != NULL);
@@ -362,11 +440,117 @@ static void parse_tablet_dimensions(WacomTabletData* wacom_data,
                 " Area failed with nonzero exit code"
         };
     }
+    else if(stdout_sink == NULL || is_empty_string(wacom_data->p_rgx, stdout_sink))
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_ERROR,
+            .err_msg = "call to xsetwacom --get <device_name>"
+                " Area returned with exit code 0 and no stdout"
+        };
+    }
     else
     {
+    }
+}
+
+static void parse_tablet_dimensions(WacomTabletData* wacom_data,
+        const char* str,
+        int* out_x, int* out_y, 
+        int* out_width, int* out_height,
+        MapToOutputError* err)
+{
+    GMatchInfo* match = NULL;
+    gboolean matched = g_regex_match_all(
+            wacom_data->p_rgx->match_tablet_dimensions,
+            str, 0, &match);
+
+    if(matched)
+    {
+        gchar** all_matches = NULL;
+        all_matches = g_match_info_fetch_all(match);
+
         if(all_matches != NULL)
+        {
+            int num_matches = 0;
+            num_matches = get_num_matches(wacom_data, all_matches);
+
+            //note: glib calls capturing groups subpatterns sometimes 
+            //(more specifically, subpatterns are a superset of capturing groups)
+            if(num_matches == MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS)
+            {
+                
+                //parse each capturing group
+                int parse_results[MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS];
+                for(int i = 0; i < MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS; i++)
+                {
+                    parse_results[i] = -1;
+
+                    //don't parse if we've already encountered an error
+                    if(err->err_type == NO_ERROR)
+                    {
+                        parse_results[i] = parse_str_to_int(all_matches[i], err);
+                    }
+                }
+
+                //copy the parse results to the output pointers to return them
+                *out_x = parse_results[0];
+                *out_y = parse_results[1];
+                *out_width = parse_results[2];
+                *out_height = parse_results[3];
+
+                //don't forget to free the matches vector
+                g_strfreev(all_matches);
+
+                return;
+            }
+            else
+            {
+                *err = (MapToOutputError){
+                    .err_type = WACOM_GET_AREA_PARSING_ERROR,
+                    .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                        " (all_matches != MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS"
+                        " but g_regex_match_all returned true)"
+                };
+            }
+
+        }
+        else
+        {
+            *err = (MapToOutputError){
+                .err_type = WACOM_GET_AREA_PARSING_ERROR,
+                .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                    " (all_matches == NULL but g_regex_match_all returned true)"
+            };
+        }
+
+        g_strfreev(all_matches);
+    }
+    else
+    {
+        *err = (MapToOutputError){
+            .err_type = WACOM_GET_AREA_PARSING_ERROR,
+            .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
+                " (no regex match)"
+        };
     }
 
+    //set in case of error
+    if(out_x != NULL)
+    {
+        *out_x = -1;
+    }
+    if(out_y != NULL)
+    {
+        *out_y = -1;
+    }
+    if(out_width != NULL)
+    {
+        *out_height = -1;
+    }
+    if(out_height != NULL)
+    {
+        *out_height = -1;
+    }
 }
 
 static void wacom_reset_map_to_output(void* v, MapToOutputError* err)
