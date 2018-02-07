@@ -222,7 +222,16 @@ MapToOutput* map_to_output_init(
     MapToOutputConfig* config;
     if(config_param == NULL)
     {
-        //TODO
+        //allocate a new config and make it a copy of the default config
+        config = malloc(sizeof(MapToOutputConfig));
+        if(config == NULL)
+        {
+            *err = bad_malloc;
+        }
+        else
+        {
+            *config = get_default_config();
+        }
     }
     else
     {
