@@ -111,7 +111,9 @@ void map_to_output_get_canvas_drawing_area_dimensions(
     *dy = canvas_widget_top_left_y;
 
     *dwidth = page_width_pixels;
-    *dheight = page_height_pixels;
+    //the page is allowed to be taller than the canvas
+    //(in which case scrolling will be turned on)
+    *dheight = MIN(canvas_height_pixels, page_height_pixels);
     return;
 
 
