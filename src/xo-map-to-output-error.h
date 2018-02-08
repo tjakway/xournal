@@ -8,6 +8,8 @@ enum MapToOutputErrorType {
     CANVAS_INIT_ERROR,
     ARG_CHECK_FAILED,
 
+    NEED_NEW_PAGE,
+
     /** a gdk call failed or returned nonsensical results 
      * can't use GDK_ERROR because it's already defined by GDK... */
     MAPTOOUTPUT_GDK_ERROR,
