@@ -26,34 +26,6 @@ MapToOutputConfig get_default_config()
     };
 }
 
-static OutputBox calculate_output_box(
-        double top_left_x,
-        double top_left_y,
-        int canvas_width,
-        int canvas_height,
-        double tablet_aspect_ratio,
-        gboolean* needs_new_page)
-{
-    OutputBox output_box;
-
-    output_box.width = canvas_width;
-    output_box.height = (int)(((double)canvas_width) / tablet_aspect_ratio);
-    output_box.top_left_x = top_left_x;
-    output_box.top_left_y = top_left_y;
-
-    const int max_height = (int)(top_left_y + ((double)canvas_height));
-    if((top_left_y + output_box.height) > max_height)
-    {
-        *needs_new_page = TRUE;
-    }
-    else
-    {
-        *needs_new_page = FALSE;
-    }
-
-    return output_box;
-}
-
 gboolean output_box_is_visible(
         GnomeCanvas* canvas, Page* page, double zoom, OutputBox box,
         MapToOutputError* err)
@@ -433,41 +405,57 @@ MapToOutput* init_map_to_output(
     }
 
 
-    const double canvas_width = GTK_WIDGET(canvas)->allocation.width,
-        canvas_height = GTK_WIDGET(canvas)->allocation.height;
+    //-----------------------------------------
+    //calculate the initial output box's width
+    //by setting it equal to the width in world coordinates that 
+    //corresponds to the width of the entire canvas in pixels
+    gboolean no_gap;
+    double canvas_viewable_x, canvas_viewable_y,
+           canvas_viewable_width, canvas_viewable_height;
+    map_to_output_get_canvas_drawing_area_dimensions(
+            canvas, page, zoom,
+            &canvas_viewable_x,
+            &canvas_viewable_y,
+            &canvas_viewable_width,
+            &canvas_viewable_height,
+            &no_gap,
+            err);
 
-    gboolean needs_new_page;
-    OutputBox output_box = calculate_output_box(
-            //blank canvas, therefore a new page
-            //so the top left is the origin
-            0, 0, 
-            //canvas dimensions
-            //TODO: should this be canvas allocation width and height?
-            (int)canvas_width, (int)canvas_height,
-            //tablet dimensions
-            ((double)map_to_output->tablet_width) / ((double)map_to_output->tablet_height),
-            &needs_new_page);
+    //get the world coordinates for the top left and top right of the canvas'
+    //viewable drawing area
+    double wc_left_x = -1, wc_left_y = -1,
+           wc_right_x = -1, wc_right_y = -1;
 
-    if(needs_new_page)
-    {
-        //TODO: can't need a new page before we've even started
-        //probably means our window is too small
-        err->err_type = NEED_NEW_PAGE;
-        err->err_msg = "Need a new page, try zooming out more";
+    gnome_canvas_window_to_world(canvas,
+            canvas_viewable_x, canvas_viewable_y,
+            &wc_left_x, &wc_left_y);
+    gnome_canvas_window_to_world(canvas,
+            canvas_viewable_x + canvas_viewable_width,
+            canvas_viewable_y,
+            &wc_right_x, &wc_right_y);
 
-        free_map_to_output(map_to_output);
-        return NULL;
-    }
+
+    const initial_width = wc_right_x - wc_left_x,
+          initial_height = initial_width / tablet_aspect_ratio;
+
+    const OutputBox initial_output_box = {
+        .top_left_x = wc_left_x,
+        .top_left_y = wc_left_y,
+        .width = initial_width,
+        .height = initial_height
+    };
+
+    //-------------------------------
 
 
     //call the tablet driver and map the tablet's output to our canvas region
     map_to_output->config->driver.map_to_output(
             map_to_output->driver_data,
             map_to_output,
-            (unsigned int)output_box.top_left_x, 
-            (unsigned int)output_box.top_left_y,
-            (unsigned int)output_box.width,
-            (unsigned int)output_box.height,
+            (unsigned int)initial_output_box.top_left_x, 
+            (unsigned int)initial_output_box.top_left_y,
+            (unsigned int)initial_output_box.width,
+            (unsigned int)initial_output_box.height,
             err);
     if(err->err_type != NO_ERROR)
     {
@@ -480,7 +468,7 @@ MapToOutput* init_map_to_output(
     }
 
     //outline the mapped output box so the user can see it
-    make_output_box_lines(map_to_output, output_box, canvas, err);
+    make_output_box_lines(map_to_output, initial_output_box, canvas, err);
     if(err->err_type != NO_ERROR)
     {
         //reset the output mapping before returning
@@ -578,7 +566,7 @@ gboolean output_box_within_page(OutputBox box, Page* page)
     return TRUE;
 }
 
-enum ShiftDownResult map_to_output_shift_down(
+enum ShiftDownResult predict_shift_down_changes(
         GnomeCanvas* canvas, Page* page, double zoom,
         MapToOutput* map_to_output, 
         MapToOutputError* err)
@@ -589,7 +577,7 @@ enum ShiftDownResult map_to_output_shift_down(
         return ERROR;
     }
 
-    ShiftDownResult res;
+    ShiftDownResult res = NO_SCREEN_CHANGE;
     if(map_to_output->output_box == NULL)
     {
         *err = (MapToOutputError){
@@ -624,10 +612,20 @@ enum ShiftDownResult map_to_output_shift_down(
             {
                 res = MOVE_SCREEN;
             }
-
         }
-
     }
+
+    return res;
+}
+
+void map_to_output_shift_down(
+        GnomeCanvas* canvas, Page* page, double zoom,
+        MapToOutput* map_to_output, 
+        MapToOutputError* err)
+{
+    OutputBox shifted_output_box = shift_output_box_down(*map_to_output->output_box);
+
+
 }
 
 void free_map_to_output(MapToOutput* map_to_output)
