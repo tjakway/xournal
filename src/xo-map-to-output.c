@@ -27,10 +27,10 @@ MapToOutputConfig get_default_config()
 static OutputBox calculate_output_box(
         double top_left_x,
         double top_left_y,
-        guint canvas_width,
-        guint canvas_height,
-        unsigned int tablet_width, 
-        unsigned int tablet_height,
+        int canvas_width,
+        int canvas_height,
+        int tablet_width, 
+        int tablet_height,
         gboolean* needs_new_page)
 {
     const double tablet_aspect_ratio  = 
@@ -39,11 +39,11 @@ static OutputBox calculate_output_box(
     OutputBox output_box;
 
     output_box.width = canvas_width;
-    output_box.height = canvas_width / tablet_aspect_ratio;
+    output_box.height = (int)(((double)canvas_width) / tablet_aspect_ratio);
     output_box.top_left_x = top_left_x;
     output_box.top_left_y = top_left_y;
 
-    const guint max_height = top_left_y + canvas_height;
+    const int max_height = (int)(top_left_y + ((double)canvas_height));
     if((top_left_y + output_box.height) > max_height)
     {
         *needs_new_page = TRUE;
@@ -276,7 +276,7 @@ MapToOutput* map_to_output_init(
             //so the top left is the origin
             0, 0, 
             //canvas dimensions
-            canvas_width, canvas_height,
+            (int)canvas_width, (int)canvas_height,
             //tablet dimensions
             map_to_output->tablet_width, map_to_output->tablet_height,
             &needs_new_page);
@@ -293,8 +293,10 @@ MapToOutput* map_to_output_init(
     map_to_output->config->driver.map_to_output(
             driver_data,
             map_to_output,
-            output_box.top_left_x, output_box.top_left_y,
-            output_box.width, output_box.height,
+            (unsigned int)output_box.top_left_x, 
+            (unsigned int)output_box.top_left_y,
+            (unsigned int)output_box.width,
+            (unsigned int)output_box.height,
             err);
     if(err->err_type != NO_ERROR)
     {
@@ -353,8 +355,8 @@ void map_to_output_asserts(MapToOutput* map_to_output)
     //do non-fatal checks before the assertions
     //if unsigned types are equal to their max, it's probably an error
     //(likely caused by an overflow)
-    g_warn_if_fail(map_to_output->tablet_width == G_MAXUINT);
-    g_warn_if_fail(map_to_output->tablet_height == G_MAXUINT);
+    g_warn_if_fail(map_to_output->tablet_width == INT_MAX);
+    g_warn_if_fail(map_to_output->tablet_height == INT_MAX);
     g_warn_if_fail(map_to_output->height == G_MAXUINT);
     g_warn_if_fail(map_to_output->width == G_MAXUINT);
 

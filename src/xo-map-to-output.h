@@ -27,7 +27,7 @@ MapToOutputConfig get_default_config(void);
 
 struct OutputBox {
     double top_left_x, top_left_y;
-    guint width, height;
+    int width, height;
 };
 
 struct MapToOutput {
@@ -38,7 +38,7 @@ struct MapToOutput {
     guint width, height;
     double pixels_per_unit;
 
-    unsigned int tablet_width, tablet_height;
+    int tablet_width, tablet_height;
 
     GnomeCanvasItem *left_line, 
         *right_line, 
