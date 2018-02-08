@@ -53,6 +53,57 @@ static OutputBox calculate_output_box(
     return output_box;
 }
 
+gboolean output_box_is_visible(
+        GnomeCanvas* canvas, Page* page, double zoom, OutputBox box
+        MapToOutputError* err)
+{
+    //get viewable area dimensions
+    double viewable_x = -1, viewable_y = -1,
+           viewable_width = -1, viewable_height = -1;
+    gboolean _no_gap;
+
+    map_to_output_get_canvas_drawing_area_dimensions(
+            canvas, page, zoom,
+            &viewable_x, &viewable_y,
+            &viewable_width, &viewable_height,
+            &_no_gap, err);
+
+    //2 doubles per coord X 4 coords
+    const int num_viewable_coords = 8;
+    double viewable_coords[num_viewable_coords] = {
+        //top left
+        viewable_x, viewable_y,
+
+        //top right
+        viewable_x + viewable_width, viewable_y,
+
+        //bottom left
+        viewable_x, viewable_y + viewable_height,
+
+        //bottom right
+        viewable_x + viewable_width, viewable_y + viewable_height
+    };
+
+    const int num_visible = 4;
+    gboolean visible[num_visible];
+    for(int i = 0; i < num_visible; i++)
+    {
+        visible[i] = FALSE;
+    }
+
+    for(int i = 0; i < num_viewable_coords; i +=2)
+    {
+        double world_x = -1, world_y = -1;
+        gnome_canvas_window_to_world(canvas, 
+            viewable_coords[i],
+            viewable_coords[i + 1],
+            &world_x, &world_y);
+
+
+    }
+
+}
+
 static void output_box_to_lines(OutputBox output_box,
         double* top, 
         double* right,
