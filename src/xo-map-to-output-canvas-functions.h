@@ -23,7 +23,7 @@ void map_to_output_scroll_to_mapped_rect(MapToOutput*, MapToOutputError*);
 /**
  * returns the top left x, y, width and height of the **viewable drawing area** of the canvas widget
  * (i.e. excluding the non-drawable background area)
- *
+ * IN PIXELS
  */
 void map_to_output_get_canvas_drawing_area_dimensions(
         GnomeCanvas*, Page*, 
