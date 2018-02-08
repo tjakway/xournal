@@ -126,6 +126,17 @@ gboolean output_box_is_visible(
         visible_points[2] && visible_points[3];
 }
 
+void output_box_to_array(OutputBox output_box, double points[8])
+{
+    const double cpy_points[8] = { output_box.top_left_x, output_box.top_left_y, 
+      output_box.top_left_x + output_box.width, output_box.top_left_y,
+      output_box.top_left_x, output_box.top_left_y  + output_box.height,
+      output_box.top_left_x + output_box.width, output_box.top_left_y  + output_box.height
+    };
+
+    memcpy(points, cpy_points, sizeof(double)*8);
+}
+
 static void output_box_to_lines(OutputBox output_box,
         double* top, 
         double* right,
@@ -180,6 +191,23 @@ static void output_box_to_lines(OutputBox output_box,
     //left point 2 = bottom left
     left[2] = bottom_left[0];
     left[3] = bottom_left[1];
+}
+
+static void set_line_points(GnomeCanvasItem* item,
+        double points[2], MapToOutputError* err)
+{
+    GnomeCanvasPoints* points = gnome_canvas_points_new(2);
+    if(points == NULL)
+    {
+        err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
+    }
+    else
+    {
+        points->coords[0] = points[0];
+        points->coords[1] = points[1];
+
+        gnome_canvas_item_set(item, "points", points, NULL);
+    }
 }
 
 static void make_output_box_lines(
@@ -522,6 +550,84 @@ void map_to_output_asserts(MapToOutput* map_to_output)
 
     assert(map_to_output->pixels_per_unit > 0);
 
+}
+
+OutputBox shift_output_box_down(OutputBox box)
+{
+    box.top_left_y += box.height;
+    return box;
+}
+
+gboolean output_box_within_page(OutputBox box, Page* page)
+{
+    double points[8];
+    output_box_to_array(box, points);
+
+    //check x
+    for(int i = 0; i < 8; i +=2)
+    {
+        if(points[i] < page->hoffset 
+                || points[i] > page->hoffset + page->width
+                //check y
+                || points[i + 1] < page->voffset 
+                || points[i + 1] < page->voffset + page->height)
+        {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+enum ShiftDownResult map_to_output_shift_down(
+        GnomeCanvas* canvas, Page* page, double zoom,
+        MapToOutput* map_to_output, 
+        MapToOutputError* err)
+{
+    //don't do anything if we've already encountered an error
+    if(err->err_type != NO_ERROR)
+    {
+        return ERROR;
+    }
+
+    ShiftDownResult res;
+    if(map_to_output->output_box == NULL)
+    {
+        *err = (MapToOutputError){
+            .err_type = NO_MAPPING_ERROR,
+            .err_msg = "map_to_output_shift_down was called when a mapping was not active"
+        };
+        return ERROR;
+    }
+    else
+    {
+        //see if the shifted output box would be visible
+        OutputBox shifted_output_box = shift_output_box_down(*map_to_output->output_box);
+
+        //check if the shifted output box runs off the page
+        if(output_box_within_page(shifted_output_box, page))
+        {
+            res = NEED_NEW_PAGE;
+        }
+        else
+        {
+            //if not, make sure it's still visible
+            gboolean visible = output_box_is_visible(canvas, ui.cur_page,
+                    ui.zoom, shifted_output_box, err);
+
+            if(err->err_type != NO_ERROR)
+            {
+                return ERROR;
+            }
+
+            //tell the caller whether or not the screen will need to be moved
+            if(!visible)
+            {
+                res = MOVE_SCREEN;
+            }
+
+        }
+
+    }
 }
 
 void free_map_to_output(MapToOutput* map_to_output)

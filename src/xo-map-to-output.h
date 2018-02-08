@@ -72,7 +72,19 @@ void free_map_to_output(
 void map_to_output_shift_down(
         MapToOutput*, 
         gboolean* needs_new_page,
+        gboolean* move_screen,
         MapToOutputError*);
+
+enum ShiftDownResult
+{
+    //there was an error--check MapToOutputError
+    ERROR = -1,
+    NO_SCREEN_CHANGE = 0,
+    //new page implies new screen
+    NEW_PAGE = 1,
+    //don't need a new page but the new output box isn't fully visible
+    MOVE_SCREEN
+};
 
 void map_to_output_new_page(
         MapToOutput*, 
@@ -81,6 +93,8 @@ void map_to_output_new_page(
 gboolean output_box_is_visible(
         GnomeCanvas* canvas, Page* page, double zoom, OutputBox box,
         MapToOutputError*);
+
+void output_box_to_array(OutputBox output_box, double points[8]);
 
 //sanity checks for MapToOutput
 //uses assert so no need for a MapToOutputError* parameter
