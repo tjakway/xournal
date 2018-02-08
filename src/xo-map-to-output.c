@@ -30,13 +30,9 @@ static OutputBox calculate_output_box(
         double top_left_y,
         int canvas_width,
         int canvas_height,
-        int tablet_width, 
-        int tablet_height,
+        double tablet_aspect_ratio,
         gboolean* needs_new_page)
 {
-    const double tablet_aspect_ratio  = 
-        ((double)tablet_width) / ((double)tablet_height);
-
     OutputBox output_box;
 
     output_box.width = canvas_width;
@@ -277,16 +273,21 @@ MapToOutput* map_to_output_init(
             //so the top left is the origin
             0, 0, 
             //canvas dimensions
+            //TODO: should this be canvas allocation width and height?
             (int)canvas_width, (int)canvas_height,
             //tablet dimensions
-            map_to_output->tablet_width, map_to_output->tablet_height,
+            ((double)map_to_output->tablet_width) / ((double)map_to_output->tablet_height),
             &needs_new_page);
 
     if(needs_new_page)
     {
-        //TODO: error... can't need a new page before we've even started
+        //TODO: can't need a new page before we've even started
         //probably means our window is too small
-        //TODO: try resizing it and see if that fixes it, otherwise warn the user and disable the mapping
+        err->err_type = NEED_NEW_PAGE;
+        err->err_msg = "Need a new page, try zooming out more";
+
+        map_to_output_free(map_to_output);
+        return NULL;
     }
 
 
