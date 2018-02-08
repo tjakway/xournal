@@ -114,6 +114,7 @@ void map_to_output_get_canvas_drawing_area_dimensions(
     *dwidth = page_width_pixels;
     //the page is allowed to be taller than the canvas
     //(in which case scrolling will be turned on)
+    //but the output box can't be taller than the canvas
     *dheight = canvas_height_pixels;
     return;
 
