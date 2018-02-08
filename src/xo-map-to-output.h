@@ -66,14 +66,7 @@ MapToOutput* init_map_to_output(
 void free_map_to_output(
         MapToOutput*);
 
-/**
- * if needs_new_page is set to true, make a new page and call map_to_output_new_page
- */
-void map_to_output_shift_down(
-        MapToOutput*, 
-        gboolean* needs_new_page,
-        gboolean* move_screen,
-        MapToOutputError*);
+
 
 enum ShiftDownResult
 {
@@ -85,6 +78,15 @@ enum ShiftDownResult
     //don't need a new page but the new output box isn't fully visible
     MOVE_SCREEN
 };
+
+enum ShiftDownResult predict_shift_down_changes(
+        GnomeCanvas* canvas, Page* page, double zoom,
+        MapToOutput* map_to_output, 
+        MapToOutputError* err);
+
+void map_to_output_shift_down(
+        MapToOutput* map_to_output, 
+        MapToOutputError* err);
 
 void map_to_output_new_page(
         MapToOutput*, 
