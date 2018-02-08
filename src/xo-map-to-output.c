@@ -665,8 +665,10 @@ void update_lines_from_output_box(
 {
     double top[2], right[2], bottom[2], left[2];
 
+    //get line points
     output_box_to_lines(box, top, right, bottom, left);
 
+    //update the points for the canvas line items
     if(err->err_type == NO_ERROR) {
         set_line_points(map_to_output->top_line, top, err);
     }
