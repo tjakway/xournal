@@ -105,9 +105,10 @@ void map_to_output_get_canvas_drawing_area_dimensions(
         }
     }
 
-    //the top left of the page is the canvas' top left plus the width gap
+    //the top left of the page is the canvas' top left plus half the width gap
+    //(the width gap is symmetric!)
     //the y value is the same
-    *dx = canvas_widget_top_left_x + width_gap;
+    *dx = canvas_widget_top_left_x + (width_gap / 2);
     *dy = canvas_widget_top_left_y;
 
     *dwidth = page_width_pixels;
