@@ -2,6 +2,7 @@
 
 #include <libgnomecanvas/libgnomecanvas.h>
 
+#include "xournal.h"
 #include "xo-map-to-output-decl.h"
 #include "xo-map-to-output-error.h"
 #include "xo-tablet-driver.h"
@@ -75,6 +76,10 @@ void map_to_output_shift_down(
 
 void map_to_output_new_page(
         MapToOutput*, 
+        MapToOutputError*);
+
+gboolean output_box_is_visible(
+        GnomeCanvas* canvas, Page* page, double zoom, OutputBox box,
         MapToOutputError*);
 
 //sanity checks for MapToOutput

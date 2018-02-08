@@ -1,3 +1,4 @@
+#include "xournal.h"
 #include "xo-map-to-output.h"
 #include "xo-map-to-output-callbacks.h"
 #include "xo-tablet-driver.h"
@@ -54,7 +55,7 @@ static OutputBox calculate_output_box(
 }
 
 gboolean output_box_is_visible(
-        GnomeCanvas* canvas, Page* page, double zoom, OutputBox box
+        GnomeCanvas* canvas, Page* page, double zoom, OutputBox box,
         MapToOutputError* err)
 {
     //get viewable area dimensions
@@ -69,39 +70,60 @@ gboolean output_box_is_visible(
             &_no_gap, err);
 
     //2 doubles per coord X 4 coords
-    const int num_viewable_coords = 8;
-    double viewable_coords[num_viewable_coords] = {
+    const int num_box_coords = 8;
+    double box_coords[num_box_coords] = {
         //top left
-        viewable_x, viewable_y,
+        box.top_left_x, box.top_left_y,
 
         //top right
-        viewable_x + viewable_width, viewable_y,
+        box.top_left_x + box.width, box.top_left_y,
 
         //bottom left
-        viewable_x, viewable_y + viewable_height,
+        box.top_left_x, box.top_left_y + box.height,
 
         //bottom right
-        viewable_x + viewable_width, viewable_y + viewable_height
+        box.top_left_x + box.width, box.top_left_y + box.height
     };
 
-    const int num_visible = 4;
-    gboolean visible[num_visible];
-    for(int i = 0; i < num_visible; i++)
+    const int num_visible_points = 4;
+    gboolean visible_points[num_visible_points];
+    for(int i = 0; i < num_visible_points; i++)
     {
-        visible[i] = FALSE;
+        visible_points[i] = FALSE;
     }
 
-    for(int i = 0; i < num_viewable_coords; i +=2)
+    for(int i = 0; i < num_box_coords; i +=2)
     {
-        double world_x = -1, world_y = -1;
-        gnome_canvas_window_to_world(canvas, 
-            viewable_coords[i],
-            viewable_coords[i + 1],
-            &world_x, &world_y);
+        double window_x = -1, window_y = -1;
+        gnome_canvas_world_to_window(canvas, 
+            box_coords[i],
+            box_coords[i + 1],
+            &window_x, &window_y);
 
+        
+        const gboolean x_within_range = 
+            window_x >= viewable_x &&
+            window_x <= (viewable_x + viewable_width);
 
+        const gboolean y_within_range =
+            window_y >= viewable_y &&
+            window_y <= (viewable_y + viewable_height);
+
+        visible_points[i / 2] = x_within_range && y_within_range;
     }
 
+    //log any nonvisible points
+    for(int i = 0; i < num_visible_points; i++)
+    {
+        if(!visible_points[i])
+        {
+            g_debug("output box coord %d not visible", i);
+        }
+    }
+
+    //return true if all points are visible
+    return visible_points[0] && visible_points[1] &&
+        visible_points[2] && visible_points[3];
 }
 
 static void output_box_to_lines(OutputBox output_box,
