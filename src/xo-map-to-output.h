@@ -53,6 +53,7 @@ struct MapToOutput {
         MAPPING_ACTIVE
     } mapping_mode;
 
+    void* driver_data;
 };
 
 //pass NULL for default config
@@ -62,8 +63,7 @@ MapToOutput* init_map_to_output(
         MapToOutputError*);
 
 void free_map_to_output(
-        MapToOutput*, 
-        MapToOutputError*);
+        MapToOutput*);
 
 /**
  * if needs_new_page is set to true, make a new page and call map_to_output_new_page

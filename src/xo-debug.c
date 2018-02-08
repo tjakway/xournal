@@ -36,7 +36,7 @@ void print_canvas_drawing_area_dimensions()
     double zoom = ui.zoom;
     g_warn_if_fail(zoom > 0);
 
-    gint x = -1, y = -1;
+    double x = -1, y = -1;
     double width = -1, height = -1;
     gboolean no_gap = FALSE;
     
@@ -57,7 +57,7 @@ void print_canvas_drawing_area_dimensions()
     }
     else
     {
-        printf("%s results: x=%d, y=%d, width=%f, height=%f, no_gap=%s\n",
+        printf("%s results: x=%f, y=%f, width=%f, height=%f, no_gap=%s\n",
                 fname, 
                 x, y, width, height,
                 no_gap ? "true" : "false");
@@ -112,6 +112,23 @@ void print_canvas_w2c(double x, double y)
     }
 
     printf("print_canvas_w2c(%f, %f): (%d, %d)\n", x, y, ret_x, ret_y);
+}
+
+void print_canvas_scroll_offsets()
+{
+    DEBUG_PRINT_CHECK_GLOBALS();
+
+    int ret_x = -1, ret_y = -1;
+
+    gnome_canvas_get_scroll_offsets(canvas, &ret_x, &ret_y);
+
+    if(ret_x < 0 || ret_y < 0)
+    {
+        fprintf(stderr, "WARNING: gnome_canvas_get_scroll_offsets "
+                "returned x < 0 || y < 0 in %s\n", __func__);
+    }
+
+    printf("canvas scroll offsets in pixels: %d, %d\n", ret_x, ret_y);
 }
 
 #endif

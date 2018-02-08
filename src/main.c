@@ -417,7 +417,7 @@ void init_stuff (int argc, char *argv[])
   //TODO
   MapToOutputError err = no_error;
   MapToOutputConfig default_config = get_default_config();
-  MapToOutput* map_to_output = map_to_output_init(&default_config, canvas, &err);
+  MapToOutput* map_to_output = init_map_to_output(&default_config, canvas, &err);
 
     print_canvas_w2c_affine_matrix();
 

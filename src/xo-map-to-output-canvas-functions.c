@@ -88,18 +88,6 @@ void map_to_output_get_canvas_drawing_area_dimensions(
     assert(canvas_width_pixels > 0);
     assert(canvas_height_pixels > 0);
 
-    //the canvas shouldn't be taller than the page
-    //TODO: use margin of error
-    if(canvas_height_pixels != page_height_pixels)
-    {
-        static const MapToOutputError w_err = {
-            .err_type = WIDGET_DIMENSION_ERROR,
-            .err_msg = "unexpected result: canvas_height_pixels != page_height_pixels"
-        };
-        *err = w_err;
-        goto get_canvas_drawing_area_dimensions_error;
-    }
-
     //calculate the width difference between our page and the canvas widget (if any)
     const double width_gap = canvas_width_pixels - page_width_pixels;
 

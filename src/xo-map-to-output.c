@@ -190,6 +190,74 @@ static void make_output_box_lines(
 }
 
 
+static void change_mapping(
+        MapToOutput* map_to_output,
+        GnomeCanvas* canvas,
+        double new_top_left_x, double new_top_left_y,
+        gboolean* needs_new_page,
+        MapToOutputError* err)
+{
+    const double canvas_width = GTK_WIDGET(canvas)->allocation.width,
+        canvas_height = GTK_WIDGET(canvas)->allocation.height;
+
+    const double tablet_aspect_ratio = 
+        ((double)map_to_output->tablet_width) / ((double)map_to_output->tablet_height);
+
+    OutputBox output_box = calculate_output_box(
+            //blank canvas, therefore a new page
+            //so the top left is the origin
+            new_top_left_x, new_top_left_y, 
+            //canvas dimensions
+            //TODO: should this be canvas allocation width and height?
+            (int)canvas_width, (int)canvas_height,
+            //tablet dimensions
+            tablet_aspect_ratio,
+            needs_new_page);
+
+    if(*needs_new_page)
+    {
+        //TODO: can't need a new page before we've even started
+        //probably means our window is too small
+        err->err_type = NEED_NEW_PAGE;
+        err->err_msg = "Need a new page, try zooming out more";
+
+        map_to_output_free(map_to_output);
+        return;
+    }
+
+
+    //call the tablet driver and map the tablet's output to our canvas region
+    map_to_output->config->driver.map_to_output(
+            map_to_output->driver_data,
+            map_to_output,
+            (unsigned int)output_box.top_left_x, 
+            (unsigned int)output_box.top_left_y,
+            (unsigned int)output_box.width,
+            (unsigned int)output_box.height,
+            err);
+    if(err->err_type != NO_ERROR)
+    {
+        //TODO
+    }
+    else
+    {
+        //should have an active mapping after calling the driver
+        assert(map_to_output->mapping_mode == MAPPING_ACTIVE);
+    }
+
+    //outline the mapped output box so the user can see it
+    make_output_box_lines(map_to_output, output_box, canvas, err);
+    if(err->err_type != NO_ERROR)
+    {
+        //reset the output mapping before returning
+        MapToOutputError reset_err = no_error;
+        map_to_output->config->driver.reset_map_to_output(
+                map_to_output->driver_data, map_to_output, &reset_err);
+        map_to_output_warn_if_error(&reset_err);
+        
+    }
+}
+
 //allocate the struct and set default values
 //return NULL on failure
 static MapToOutput* alloc_map_to_output()
@@ -244,8 +312,8 @@ MapToOutput* init_map_to_output(
 
     map_to_output->config = config;
 
-    void* driver_data = map_to_output->config->driver.init_driver(err);
-    if(err->err_type != NO_ERROR || driver_data == NULL)
+    map_to_output->driver_data = map_to_output->config->driver.init_driver(err);
+    if(err->err_type != NO_ERROR || map_to_output->driver_data == NULL)
     {
         goto map_to_output_init_error;
     }
@@ -253,7 +321,7 @@ MapToOutput* init_map_to_output(
 
     //need the tablet dimensions to calculate the aspect ratio
     map_to_output->config->driver.get_tablet_dimensions(
-            driver_data,
+            map_to_output->driver_data,
             &map_to_output->tablet_width,
             &map_to_output->tablet_height,
             err);
@@ -286,14 +354,14 @@ MapToOutput* init_map_to_output(
         err->err_type = NEED_NEW_PAGE;
         err->err_msg = "Need a new page, try zooming out more";
 
-        map_to_output_free(map_to_output);
+        free_map_to_output(map_to_output);
         return NULL;
     }
 
 
     //call the tablet driver and map the tablet's output to our canvas region
     map_to_output->config->driver.map_to_output(
-            driver_data,
+            map_to_output->driver_data,
             map_to_output,
             (unsigned int)output_box.top_left_x, 
             (unsigned int)output_box.top_left_y,
@@ -316,7 +384,7 @@ MapToOutput* init_map_to_output(
     {
         //reset the output mapping before returning
         MapToOutputError reset_err = no_error;
-        map_to_output->config->driver.reset_map_to_output(driver_data, map_to_output, &reset_err);
+        map_to_output->config->driver.reset_map_to_output(map_to_output->driver_data, map_to_output, &reset_err);
         map_to_output_warn_if_error(&reset_err);
         
         goto map_to_output_init_error;
@@ -381,4 +449,9 @@ void map_to_output_asserts(MapToOutput* map_to_output)
 
     assert(map_to_output->pixels_per_unit > 0);
 
+}
+
+void free_map_to_output(MapToOutput* map_to_output)
+{
+    //TODO
 }
