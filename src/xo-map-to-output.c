@@ -211,7 +211,7 @@ static MapToOutput* alloc_map_to_output()
 }
 
 
-MapToOutput* map_to_output_init(
+MapToOutput* init_map_to_output(
         MapToOutputConfig* config_param, 
         GnomeCanvas* canvas,
         MapToOutputError* err)

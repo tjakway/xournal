@@ -56,12 +56,12 @@ struct MapToOutput {
 };
 
 //pass NULL for default config
-MapToOutput* map_to_output_init(
+MapToOutput* init_map_to_output(
         MapToOutputConfig*, 
         GnomeCanvas*,
         MapToOutputError*);
 
-void map_to_output_free(
+void free_map_to_output(
         MapToOutput*, 
         MapToOutputError*);
 
