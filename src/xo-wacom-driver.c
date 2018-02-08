@@ -407,7 +407,7 @@ WacomTabletData* init_wacom_tablet_data(MapToOutputError* err)
     {
         if(err != NULL)
         {
-            *err = bad_malloc;
+            *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
         }
         return NULL;
     }

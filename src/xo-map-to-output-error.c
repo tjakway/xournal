@@ -7,10 +7,6 @@ const MapToOutputError no_error = {
     .err_msg = "Success"
 };
 
-const MapToOutputError bad_malloc = {
-    .err_type = BAD_MALLOC,
-    .err_msg = "malloc returned NULL"
-};
 
 
 void map_to_output_warn_if_error(MapToOutputError* err)

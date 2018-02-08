@@ -31,7 +31,12 @@ typedef struct MapToOutputError {
     const char* err_msg;
 } MapToOutputError;
 
+
+#define MAP_TO_OUTPUT_ERROR_BAD_MALLOC (MapToOutputError) { \
+        .err_type = BAD_MALLOC, \
+        .err_msg = "malloc returned NULL, reported on line __LINE__  of file  __FILE__ "\
+    };
+
 void map_to_output_warn_if_error(MapToOutputError*);
 
 extern const MapToOutputError no_error;
-extern const MapToOutputError bad_malloc;

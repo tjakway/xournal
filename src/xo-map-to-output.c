@@ -1,6 +1,7 @@
 #include "xo-map-to-output.h"
 #include "xo-map-to-output-callbacks.h"
 #include "xo-tablet-driver.h"
+#include "xo-map-to-output-error.h"
 
 #include <stdlib.h>
 #include <assert.h>
@@ -226,7 +227,7 @@ MapToOutput* map_to_output_init(
         config = malloc(sizeof(MapToOutputConfig));
         if(config == NULL)
         {
-            *err = bad_malloc;
+            *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
         }
         else
         {
@@ -241,7 +242,7 @@ MapToOutput* map_to_output_init(
     MapToOutput* map_to_output = alloc_map_to_output();
     if(map_to_output == NULL)
     {
-        *err = bad_malloc;
+        *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
         goto map_to_output_init_error;
     }
 
