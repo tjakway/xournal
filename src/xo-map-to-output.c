@@ -355,6 +355,8 @@ static MapToOutput* alloc_map_to_output()
 MapToOutput* init_map_to_output(
         MapToOutputConfig* config_param, 
         GnomeCanvas* canvas,
+        Page*,
+        double zoom,
         MapToOutputError* err)
 {
     MapToOutputConfig* config;
@@ -405,47 +407,8 @@ MapToOutput* init_map_to_output(
     }
 
 
-    //-----------------------------------------
-    //calculate the initial output box's width
-    //by setting it equal to the width in world coordinates that 
-    //corresponds to the width of the entire canvas in pixels
-    gboolean no_gap;
-    double canvas_viewable_x, canvas_viewable_y,
-           canvas_viewable_width, canvas_viewable_height;
-    map_to_output_get_canvas_drawing_area_dimensions(
-            canvas, page, zoom,
-            &canvas_viewable_x,
-            &canvas_viewable_y,
-            &canvas_viewable_width,
-            &canvas_viewable_height,
-            &no_gap,
-            err);
-
-    //get the world coordinates for the top left and top right of the canvas'
-    //viewable drawing area
-    double wc_left_x = -1, wc_left_y = -1,
-           wc_right_x = -1, wc_right_y = -1;
-
-    gnome_canvas_window_to_world(canvas,
-            canvas_viewable_x, canvas_viewable_y,
-            &wc_left_x, &wc_left_y);
-    gnome_canvas_window_to_world(canvas,
-            canvas_viewable_x + canvas_viewable_width,
-            canvas_viewable_y,
-            &wc_right_x, &wc_right_y);
-
-
-    const initial_width = wc_right_x - wc_left_x,
-          initial_height = initial_width / tablet_aspect_ratio;
-
-    const OutputBox initial_output_box = {
-        .top_left_x = wc_left_x,
-        .top_left_y = wc_left_y,
-        .width = initial_width,
-        .height = initial_height
-    };
-
-    //-------------------------------
+    const OutputBox initial_output_box = calculate_initial_output_box(canvas, 
+            page, zoom, err);
 
 
     //call the tablet driver and map the tablet's output to our canvas region
@@ -501,6 +464,53 @@ map_to_output_init_error:
     }
     return NULL;
 }
+
+OutputBox calculate_initial_output_box(
+        GnomeCanvas* canvas, Page* page, double zoom,
+        MapToOutputError* err)
+{
+    //calculate the initial output box's width
+    //by setting it equal to the width in world coordinates that 
+    //corresponds to the width of the entire canvas in pixels
+    gboolean no_gap;
+    double canvas_viewable_x, canvas_viewable_y,
+           canvas_viewable_width, canvas_viewable_height;
+    map_to_output_get_canvas_drawing_area_dimensions(
+            canvas, page, zoom,
+            &canvas_viewable_x,
+            &canvas_viewable_y,
+            &canvas_viewable_width,
+            &canvas_viewable_height,
+            &no_gap,
+            err);
+
+    //get the world coordinates for the top left and top right of the canvas'
+    //viewable drawing area
+    double wc_left_x = -1, wc_left_y = -1,
+           wc_right_x = -1, wc_right_y = -1;
+
+    gnome_canvas_window_to_world(canvas,
+            canvas_viewable_x, canvas_viewable_y,
+            &wc_left_x, &wc_left_y);
+    gnome_canvas_window_to_world(canvas,
+            canvas_viewable_x + canvas_viewable_width,
+            canvas_viewable_y,
+            &wc_right_x, &wc_right_y);
+
+
+    const initial_width = wc_right_x - wc_left_x,
+          initial_height = initial_width / tablet_aspect_ratio;
+
+    const OutputBox initial_output_box = {
+        .top_left_x = wc_left_x,
+        .top_left_y = wc_left_y,
+        .width = initial_width,
+        .height = initial_height
+    };
+
+    return initial_output_box;
+}
+
 
 //sanity checks (mostly null checks)
 //should only be called after MapToOutput is initialized by map_to_output_init
@@ -649,6 +659,28 @@ void map_to_output_coords_from_output_box(MapToOutput* map_to_output,
             map_x, map_y, map_width, map_height, err);
 }
 
+void update_lines_from_output_box(
+        MapToOutput* map_to_output,
+        OutputBox box, MapToOutputError* err)
+{
+    double top[2], right[2], bottom[2], left[2];
+
+    output_box_to_lines(box, top, right, bottom, left);
+
+    if(err->err_type == NO_ERROR) {
+        set_line_points(map_to_output->top_line, top, err);
+    }
+    if(err->err_type == NO_ERROR) {
+        set_line_points(map_to_output->right_line, right, err);
+    }
+    if(err->err_type == NO_ERROR) {
+        set_line_points(map_to_output->bottom_line, bottom, err);
+    }
+    if(err->err_type == NO_ERROR) {
+        set_line_points(map_to_output->left_line, left, err);
+    }
+}
+
 void map_to_output_shift_down(
         MapToOutput* map_to_output, 
         MapToOutputError* err)
@@ -657,7 +689,11 @@ void map_to_output_shift_down(
 
     map_to_output_coords_from_output_box(map_to_output, shifted_output_box, err);
     *map_to_output->output_box = shifted_output_box;
+
+
 }
+
+
 
 void free_map_to_output(MapToOutput* map_to_output)
 {
