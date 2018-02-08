@@ -618,14 +618,45 @@ enum ShiftDownResult predict_shift_down_changes(
     return res;
 }
 
+void map_to_output_coords_from_output_box(MapToOutput* map_to_output,
+        OutputBox box, MapToOutputError* err)
+{
+    //get screen coords from the output box
+    double window_top_left_x = -1, window_top_left_y = -1;
+
+    gnome_canvas_world_to_window(canvas,
+            box.top_left_x, box.top_left_y,
+            &window_top_left_x, window_top_left_y);
+
+    double window_top_right_x = -1, window_top_right_y = -1;
+    gnome_canvas_world_to_window(canvas,
+            box.top_left_x + box.width, box.top_left_y,
+            &window_top_right_x, &window_top_right_y);
+
+    double window_bottom_left_x = -1, window_bottom_left_y = -1;
+    gnome_canvas_world_to_window(canvas,
+            box.top_left_x, box.top_left_y + box.height,
+            &window_bottom_left_x, &window_bottom_left_y);
+    
+    const unsigned int map_x = (unsigned int)window_top_left_x, 
+                       map_y = (unsigned int)window_top_left_y,
+                       map_width = (unsigned int)(window_top_right_x - window_top_left_x),
+                       map_height = (unsigned int)(window_bottom_left_y - window_top_left_y);
+
+    map_to_output->config->driver.map_to_output(
+            map_to_output->driver_data,
+            map_to_output,
+            map_x, map_y, map_width, map_height, err);
+}
+
 void map_to_output_shift_down(
-        GnomeCanvas* canvas, Page* page, double zoom,
         MapToOutput* map_to_output, 
         MapToOutputError* err)
 {
     OutputBox shifted_output_box = shift_output_box_down(*map_to_output->output_box);
 
-
+    map_to_output_coords_from_output_box(map_to_output, shifted_output_box, err);
+    *map_to_output->output_box = shifted_output_box;
 }
 
 void free_map_to_output(MapToOutput* map_to_output)
