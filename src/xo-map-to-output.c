@@ -690,9 +690,11 @@ void map_to_output_shift_down(
     OutputBox shifted_output_box = shift_output_box_down(*map_to_output->output_box);
 
     map_to_output_coords_from_output_box(map_to_output, shifted_output_box, err);
+
+    update_lines_from_output_box(map_to_output, shifted_output_box, )
+
+    //don't update the stored
     *map_to_output->output_box = shifted_output_box;
-
-
 }
 
 

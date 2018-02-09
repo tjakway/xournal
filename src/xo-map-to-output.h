@@ -61,6 +61,8 @@ struct MapToOutput {
 MapToOutput* init_map_to_output(
         MapToOutputConfig*, 
         GnomeCanvas*,
+        Page*,
+        double zoom,
         MapToOutputError*);
 
 void free_map_to_output(
