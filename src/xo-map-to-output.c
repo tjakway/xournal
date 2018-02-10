@@ -694,28 +694,27 @@ void update_lines_from_output_box(
 /**
  * scroll down by 1 unit
  */
-static void scroll_down_1_unit(GtkWindow* win, int page_no)
+static void scroll_down_1_unit(GnomeCanvas* canvas)
 {
-    //see https://stackoverflow.com/questions/11353184/gtk-programmatically-scroll-back-a-single-line-in-scrolled-window-containing-a
-    GtkAdjustment* vertAdj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(win[page_no]));
-    double adjValue = gtk_adjustment_get_value(vertAdj);
-
-    double upper = gtk_adjustment_get_upper(vertAdj);
-    double page_size = gtk_adjustment_get_page_size(vertAdj);
-
-    if (adjValue < upper - page_size)
-    {
-      gtk_adjustment_set_value (vertAdj,gtk_adjustment_get_value(vertAdj)+1);
-    }
+    int hoffset = -1, voffset = -1;
+    gnome_canvas_get_scroll_offsets(canvas, &hoffset, &voffset);
+    gnome_canvas_scroll_to(canvas, hoffset, voffset + 1);
 }
 
 static void scroll_to_output_box(
         MapToOutput* map_to_output, 
         GnomeCanvas* canvas,
+        Page* page,
+        double zoom,
+        OutputBox output_box,
         MapToOutputError* err)
 {
-    //programmatically 
-
+    //programmatically scroll down until the outputbox is visible
+    while(ERR_OK(err) && !output_box_is_visible(canvas, page, zoom, output_box, err))
+    {
+        scroll_down_1_unit(canvas);
+        //TODO: add checks that we didn't scroll too far...
+    }
 }
 
 void map_to_output_shift_down(
