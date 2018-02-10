@@ -102,7 +102,7 @@ void print_canvas_w2c(double x, double y)
 {
     DEBUG_PRINT_CHECK_GLOBALS();
 
-    int ret_x = -1, ret_y = -1;
+    double ret_x = -1, ret_y = -1;
 
     gnome_canvas_w2c_d(canvas, x, y, &ret_x, &ret_y);
 
@@ -111,7 +111,7 @@ void print_canvas_w2c(double x, double y)
         fprintf(stderr, "WARNING: gnome_canvas_w2c_d returned x < 0 || y < 0 in %s\n", __func__);
     }
 
-    printf("print_canvas_w2c(%f, %f): (%d, %d)\n", x, y, ret_x, ret_y);
+    printf("print_canvas_w2c(%f, %f): (%f, %f)\n", x, y, ret_x, ret_y);
 }
 
 void print_canvas_scroll_offsets()
