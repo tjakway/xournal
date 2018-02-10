@@ -108,3 +108,5 @@ void map_to_output_asserts(MapToOutput*);
 //should restore regular pointer behavior when disabled
 void map_to_output_enable(gboolean);
 void map_to_output_toggle(gboolean);
+
+double map_to_output_get_tablet_aspect_ratio(MapToOutput* map_to_output);

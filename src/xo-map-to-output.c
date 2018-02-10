@@ -26,6 +26,13 @@ MapToOutputConfig get_default_config()
     };
 }
 
+double map_to_output_get_tablet_aspect_ratio(MapToOutput* map_to_output)
+{
+    g_warn_if_fail(map_to_output != NULL);
+
+    return ((double)map_to_output->tablet_width) / ((double)map_to_output->tablet_height);
+}
+
 gboolean output_box_is_visible(
         GnomeCanvas* canvas, Page* page, double zoom, OutputBox box,
         MapToOutputError* err)
@@ -168,15 +175,15 @@ static void output_box_to_lines(OutputBox output_box,
 static void set_line_points(GnomeCanvasItem* item,
         double points[2], MapToOutputError* err)
 {
-    GnomeCanvasPoints* points = gnome_canvas_points_new(2);
-    if(points == NULL)
+    GnomeCanvasPoints* canvas_points = gnome_canvas_points_new(2);
+    if(canvas_points == NULL)
     {
         err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
     }
     else
     {
-        points->coords[0] = points[0];
-        points->coords[1] = points[1];
+        canvas_points->coords[0] = points[0];
+        canvas_points->coords[1] = points[1];
 
         gnome_canvas_item_set(item, "points", points, NULL);
     }
@@ -499,7 +506,8 @@ OutputBox calculate_initial_output_box(
 
 
     const initial_width = wc_right_x - wc_left_x,
-          initial_height = initial_width / tablet_aspect_ratio;
+          initial_height = 
+              initial_width / map_to_output_get_tablet_aspect_ratio(map_to_output);
 
     const OutputBox initial_output_box = {
         .top_left_x = wc_left_x,
