@@ -535,7 +535,7 @@ static void parse_tablet_dimensions(WacomTabletData* wacom_data,
         MapToOutputError* err)
 {
     GMatchInfo* match = NULL;
-    gboolean matched = g_regex_match_all(
+    gboolean matched = g_regex_match(
             wacom_data->p_rgx->match_tablet_dimensions,
             str, 0, &match);
 
@@ -551,19 +551,19 @@ static void parse_tablet_dimensions(WacomTabletData* wacom_data,
 
             //note: glib calls capturing groups subpatterns sometimes 
             //(more specifically, subpatterns are a superset of capturing groups)
-            if(num_matches == MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS)
+            if(num_matches == (MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS + 1))
             {
                 
                 //parse each capturing group
                 int parse_results[MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS];
-                for(int i = 0; i < MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS; i++)
+                for(int i = 1; i < (MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS+1); i++)
                 {
-                    parse_results[i] = -1;
+                    parse_results[i-1] = -1;
 
                     //don't parse if we've already encountered an error
                     if(err->err_type == NO_ERROR)
                     {
-                        parse_results[i] = parse_str_to_int(all_matches[i], err);
+                        parse_results[i-1] = parse_str_to_int(all_matches[i], err);
                     }
                 }
 
