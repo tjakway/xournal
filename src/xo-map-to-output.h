@@ -88,6 +88,10 @@ enum ShiftDownResult predict_shift_down_changes(
 
 void map_to_output_shift_down(
         MapToOutput* map_to_output, 
+        GnomeCanvas* canvas,
+        Page* page,
+        double zoom,
+        OutputBox output_box,
         MapToOutputError* err);
 
 void map_to_output_new_page(

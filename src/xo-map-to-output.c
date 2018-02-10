@@ -701,6 +701,9 @@ static void scroll_down_1_unit(GnomeCanvas* canvas)
     gnome_canvas_scroll_to(canvas, hoffset, voffset + 1);
 }
 
+/**
+ * scroll to the output box or do nothing if it's already visible
+ */
 static void scroll_to_output_box(
         MapToOutput* map_to_output, 
         GnomeCanvas* canvas,
@@ -719,6 +722,10 @@ static void scroll_to_output_box(
 
 void map_to_output_shift_down(
         MapToOutput* map_to_output, 
+        GnomeCanvas* canvas,
+        Page* page,
+        double zoom,
+        OutputBox output_box,
         MapToOutputError* err)
 {
     OutputBox shifted_output_box = shift_output_box_down(*map_to_output->output_box);
@@ -730,6 +737,7 @@ void map_to_output_shift_down(
     //****TODO****
     
     //if the output box isn't visible, scroll to it
+    scroll_to_output_box(map_to_output, canvas, page, zoom, output_box, err);
 
     //don't update the stored OutputBox until we're successful
     *map_to_output->output_box = shifted_output_box;
