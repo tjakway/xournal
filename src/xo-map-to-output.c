@@ -16,6 +16,7 @@ MapToOutput* GLOBAL_MAP_TO_OUTPUT;
 G_LOCK_DEFINE(GLOBAL_MAP_TO_OUTPUT);
 /**********************/
 
+#define NUM_BOX_COORDS 8
 
 OutputBox calculate_initial_output_box(
         MapToOutput* map_to_output, //only need for the tablet aspect ratio
@@ -56,8 +57,7 @@ gboolean output_box_is_visible(
             &_no_gap, err);
 
     //2 doubles per coord X 4 coords
-    const int num_box_coords = 8;
-    double box_coords[num_box_coords] = {
+    double box_coords[NUM_BOX_COORDS] = {
         //top left
         box.top_left_x, box.top_left_y,
 
@@ -78,7 +78,7 @@ gboolean output_box_is_visible(
         visible_points[i] = FALSE;
     }
 
-    for(int i = 0; i < num_box_coords; i +=2)
+    for(int i = 0; i < NUM_BOX_COORDS; i +=2)
     {
         double window_x = -1, window_y = -1;
         gnome_canvas_world_to_window(canvas, 
