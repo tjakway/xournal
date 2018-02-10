@@ -3,6 +3,7 @@
 #include "xo-map-to-output-callbacks.h"
 #include "xo-tablet-driver.h"
 #include "xo-map-to-output-error.h"
+#include "xo-map-to-output-canvas-functions.h"
 
 #include <stdlib.h>
 #include <assert.h>
@@ -14,6 +15,12 @@
 MapToOutput* GLOBAL_MAP_TO_OUTPUT;
 G_LOCK_DEFINE(GLOBAL_MAP_TO_OUTPUT);
 /**********************/
+
+
+OutputBox calculate_initial_output_box(
+        MapToOutput* map_to_output, //only need for the tablet aspect ratio
+        GnomeCanvas* canvas, Page* page, double zoom,
+        MapToOutputError* err);
 
 //XXX: keep up to date
 MapToOutputConfig get_default_config()
@@ -270,6 +277,7 @@ static void make_output_box_lines(
 }
 
 
+/*
 static void change_mapping(
         MapToOutput* map_to_output,
         GnomeCanvas* canvas,
@@ -336,6 +344,7 @@ static void change_mapping(
         
     }
 }
+*/
 
 //allocate the struct and set default values
 //return NULL on failure
@@ -409,12 +418,11 @@ MapToOutput* init_map_to_output(
     if(err->err_type != NO_ERROR)
     {
         //if get_tablet_dimensions failed the driver will have set *err
-        goto map_to_output_init_error;
+        goto map_to_output_init_error; 
     }
 
-
-    const OutputBox initial_output_box = calculate_initial_output_box(canvas, 
-            page, zoom, err);
+    const OutputBox initial_output_box = calculate_initial_output_box(
+            map_to_output, canvas, page, zoom, err);
 
 
     //call the tablet driver and map the tablet's output to our canvas region
