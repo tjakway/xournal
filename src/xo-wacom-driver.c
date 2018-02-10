@@ -486,7 +486,7 @@ static void run_and_parse_tablet_dimensions(
     const int cmd_buf_len = 2048;
     char cmd_buf[cmd_buf_len];
 
-    snprintf(cmd_buf, cmd_buf_len, "%s --get %s Area",
+    snprintf(cmd_buf, cmd_buf_len, "%s --get '%s' Area",
             WACOM_DRIVER, wacom_data->device_name);
 
     gboolean res = g_spawn_command_line_sync(cmd_buf,
