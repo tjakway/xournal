@@ -701,7 +701,9 @@ void map_to_output_shift_down(
 
     update_lines_from_output_box(map_to_output, shifted_output_box, err);
 
-    //don't update the stored
+    //****TODO****
+
+    //don't update the stored OutputBox until we're successful
     *map_to_output->output_box = shifted_output_box;
 }
 
