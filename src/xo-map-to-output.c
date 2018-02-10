@@ -691,6 +691,33 @@ void update_lines_from_output_box(
     }
 }
 
+/**
+ * scroll down by 1 unit
+ */
+static void scroll_down_1_unit(GtkWindow* win, int page_no)
+{
+    //see https://stackoverflow.com/questions/11353184/gtk-programmatically-scroll-back-a-single-line-in-scrolled-window-containing-a
+    GtkAdjustment* vertAdj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(win[page_no]));
+    double adjValue = gtk_adjustment_get_value(vertAdj);
+
+    double upper = gtk_adjustment_get_upper(vertAdj);
+    double page_size = gtk_adjustment_get_page_size(vertAdj);
+
+    if (adjValue < upper - page_size)
+    {
+      gtk_adjustment_set_value (vertAdj,gtk_adjustment_get_value(vertAdj)+1);
+    }
+}
+
+static void scroll_to_output_box(
+        MapToOutput* map_to_output, 
+        GnomeCanvas* canvas,
+        MapToOutputError* err)
+{
+    //programmatically 
+
+}
+
 void map_to_output_shift_down(
         MapToOutput* map_to_output, 
         MapToOutputError* err)
@@ -702,6 +729,8 @@ void map_to_output_shift_down(
     update_lines_from_output_box(map_to_output, shifted_output_box, err);
 
     //****TODO****
+    
+    //if the output box isn't visible, scroll to it
 
     //don't update the stored OutputBox until we're successful
     *map_to_output->output_box = shifted_output_box;
