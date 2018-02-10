@@ -644,7 +644,7 @@ void map_to_output_coords_from_output_box(MapToOutput* map_to_output,
 
     gnome_canvas_world_to_window(canvas,
             box.top_left_x, box.top_left_y,
-            &window_top_left_x, window_top_left_y);
+            &window_top_left_x, &window_top_left_y);
 
     double window_top_right_x = -1, window_top_right_y = -1;
     gnome_canvas_world_to_window(canvas,
@@ -699,7 +699,7 @@ void map_to_output_shift_down(
 
     map_to_output_coords_from_output_box(map_to_output, shifted_output_box, err);
 
-    update_lines_from_output_box(map_to_output, shifted_output_box, )
+    update_lines_from_output_box(map_to_output, shifted_output_box, err);
 
     //don't update the stored
     *map_to_output->output_box = shifted_output_box;
