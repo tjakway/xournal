@@ -178,7 +178,7 @@ static void set_line_points(GnomeCanvasItem* item,
     GnomeCanvasPoints* canvas_points = gnome_canvas_points_new(2);
     if(canvas_points == NULL)
     {
-        err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
+        *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
     }
     else
     {
@@ -280,8 +280,7 @@ static void change_mapping(
     const double canvas_width = GTK_WIDGET(canvas)->allocation.width,
         canvas_height = GTK_WIDGET(canvas)->allocation.height;
 
-    const double tablet_aspect_ratio = 
-        ((double)map_to_output->tablet_width) / ((double)map_to_output->tablet_height);
+    const double tablet_aspect_ratio = map_to_output_get_tablet_aspect_ratio(map_to_output);
 
     OutputBox output_box = calculate_output_box(
             //blank canvas, therefore a new page
@@ -362,7 +361,7 @@ static MapToOutput* alloc_map_to_output()
 MapToOutput* init_map_to_output(
         MapToOutputConfig* config_param, 
         GnomeCanvas* canvas,
-        Page*,
+        Page* page,
         double zoom,
         MapToOutputError* err)
 {
@@ -473,6 +472,7 @@ map_to_output_init_error:
 }
 
 OutputBox calculate_initial_output_box(
+        MapToOutput* map_to_output, //only need for the tablet aspect ratio
         GnomeCanvas* canvas, Page* page, double zoom,
         MapToOutputError* err)
 {
@@ -595,7 +595,7 @@ enum ShiftDownResult predict_shift_down_changes(
         return ERROR;
     }
 
-    ShiftDownResult res = NO_SCREEN_CHANGE;
+    enum ShiftDownResult res = NO_SCREEN_CHANGE;
     if(map_to_output->output_box == NULL)
     {
         *err = (MapToOutputError){
