@@ -12,6 +12,8 @@ enum MapToOutputErrorType {
 
     NEED_NEW_PAGE,
 
+    NO_OUTPUT_BOX,
+
     /** a gdk call failed or returned nonsensical results 
      * can't use GDK_ERROR because it's already defined by GDK... */
     MAPTOOUTPUT_GDK_ERROR,
@@ -32,13 +34,16 @@ enum MapToOutputErrorType {
 
 typedef struct MapToOutputError {
     enum MapToOutputErrorType err_type;
+    /**
+     * a statically allocated error message
+     */
     const char* err_msg;
 } MapToOutputError;
 
 
 #define MAP_TO_OUTPUT_ERROR_BAD_MALLOC (MapToOutputError) { \
         .err_type = BAD_MALLOC, \
-        .err_msg = "malloc returned NULL, reported on line __LINE__  of file  __FILE__ "\
+        .err_msg = "malloc returned NULL, reported on line " __LINE__ " of file " __FILE__  \
     };
 
 #define ERR_OK(err) (err != NULL && err->err_type == NO_ERROR)

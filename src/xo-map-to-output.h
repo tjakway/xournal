@@ -114,3 +114,8 @@ void map_to_output_enable(gboolean);
 void map_to_output_toggle(gboolean);
 
 double map_to_output_get_tablet_aspect_ratio(MapToOutput* map_to_output);
+
+
+void update_lines_from_output_box(
+        MapToOutput* map_to_output,
+        OutputBox box, MapToOutputError* err);

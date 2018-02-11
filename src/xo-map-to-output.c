@@ -751,6 +751,53 @@ void map_to_output_shift_down(
     *map_to_output->output_box = shifted_output_box;
 }
 
+/**
+ * allow_new: whether or not to create a new mapping
+ * (if false and mapping_mode != NO_MAPPING then nothing will be done)
+ */
+void map_to_output_do_mapping(
+        MapToOutput* map_to_output,
+        gboolean allow_new,
+        MapToOutputError* err)
+{
+    g_warn_if_fail(map_to_output != NULL);
+    g_warn_if_fail(err != NULL);
+
+    if(!ERR_OK(err))
+    {
+        return;
+    }
+
+    if(!allow_new && map_to_output->mapping_mode == NO_MAPPING)
+    {
+        return;
+    }
+    else if(map_to_output->mapping_mode == NO_MAPPING)
+    {
+        //create a new mapping
+
+    }
+    else if(map_to_output->mapping_mode != NO_MAPPING)
+    {
+        //it's an existing mapping
+        
+
+        if(map_to_output->output_box == NULL)
+        {
+            *err = (MapToOutputError){
+                .err_type = NO_OUTPUT_BOX,
+                .err_msg = "map_to_output->output_box == NULL even though "
+                    "mapping_mode != NO_MAPPING (line " __LINE__ " of " __FILE__ ")"
+            };
+            return;
+        }
+        else
+        {
+            //TODO
+        }
+    }
+}
+
 
 
 void free_map_to_output(MapToOutput* map_to_output)
