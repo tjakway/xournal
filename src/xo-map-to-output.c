@@ -457,7 +457,6 @@ void map_to_output_asserts(MapToOutput* map_to_output)
     }
 
     assert(map_to_output->config != NULL);
-    assert(map_to_output->canvas != NULL);
     assert(map_to_output->left_line != NULL);
     assert(map_to_output->right_line != NULL);
     assert(map_to_output->top_line != NULL);
