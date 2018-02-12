@@ -621,7 +621,7 @@ enum ShiftDownResult predict_shift_down_changes(
         //check if the shifted output box runs off the page
         if(output_box_within_page(shifted_output_box, page))
         {
-            res = NEED_NEW_PAGE;
+            res = NEW_PAGE;
         }
         else
         {
