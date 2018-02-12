@@ -699,6 +699,22 @@ void map_to_output_do_mapping(
         if(!ERR_OK(err))
             { return; } 
 
+        //allocate space for the new output box
+        if(map_to_output->output_box == NULL)
+        {
+            map_to_output->output_box = malloc(sizeof(OutputBox));
+            if(map_to_output->output_box == NULL)
+            {
+                *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
+            }
+            else
+            {
+                *map_to_output->output_box = initial_output_box;
+            }
+        }
+        if(!ERR_OK(err))
+            { return; } 
+
         //outline it on the canvas
         make_output_box_lines(map_to_output, initial_output_box, canvas, err);
         if(!ERR_OK(err))
