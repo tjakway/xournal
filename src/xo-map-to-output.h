@@ -58,6 +58,7 @@ struct MapToOutput {
 //pass NULL for default config
 MapToOutput* init_map_to_output(
         MapToOutputConfig*, 
+        double,
         MapToOutputError*);
 
 void free_map_to_output(

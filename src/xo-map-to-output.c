@@ -303,6 +303,7 @@ static MapToOutput* alloc_map_to_output()
 
 MapToOutput* init_map_to_output(
         MapToOutputConfig* config_param, 
+        double zoom,
         MapToOutputError* err)
 {
     MapToOutputConfig* config;
@@ -352,6 +353,7 @@ MapToOutput* init_map_to_output(
     }
 
 
+    map_to_output->pixels_per_unit = zoom;
 
     map_to_output_do_mapping(map_to_output, TRUE, err);
 
