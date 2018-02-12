@@ -698,7 +698,7 @@ static void call_map_to_output(
     if(reset)
     {
         snprintf(cmd_buf, cmd_buf_len, 
-                "%s --set %s MapToOutput desktop",
+                "%s --set '%s' MapToOutput desktop",
                 WACOM_DRIVER, wacom_data->device_name);
     }
     //create a new mapping, overwriting the old one
@@ -708,7 +708,7 @@ static void call_map_to_output(
         //the format is WIDTHxHEIGHT+X+Y
         //DO NOT PUT X AND Y FIRST!
         snprintf(cmd_buf, cmd_buf_len, 
-                "%s --set %s MapToOutput desktop %ux%u+%u+%u",
+                "%s --set '%s' MapToOutput desktop %ux%u+%u+%u",
                 WACOM_DRIVER, wacom_data->device_name,
                 width, height, x, y);
     }
