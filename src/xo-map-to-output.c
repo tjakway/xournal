@@ -623,14 +623,14 @@ void map_to_output_shift_down(
         OutputBox output_box,
         MapToOutputError* err)
 {
-    if(!ERR_OK)
+    if(!ERR_OK(err))
     { return; }
 
     OutputBox shifted_output_box = shift_output_box_down(*map_to_output->output_box);
 
     enum ShiftDownResult shift_result = 
         predict_shift_down_changes(canvas, page, zoom, map_to_output, err);
-    if(!ERR_OK)
+    if(!ERR_OK(err))
     { return; }
 
     //we'll need a new page so create one programmatically
@@ -646,7 +646,7 @@ void map_to_output_shift_down(
 
     //refresh the mapping
     map_to_output_do_mapping(map_to_output, FALSE, err);
-    if(!ERR_OK)
+    if(!ERR_OK(err))
     {
         //reset the output box before returning
         *map_to_output->output_box = old_output_box;
@@ -665,7 +665,7 @@ void map_to_output_do_mapping(
     g_warn_if_fail(map_to_output != NULL);
     g_warn_if_fail(err != NULL);
 
-    if(!ERR_OK(err))
+    if(!ERR_OK(err)(err))
     {
         return;
     }
@@ -682,18 +682,18 @@ void map_to_output_do_mapping(
         //calculate the initial output box
         const OutputBox initial_output_box = calculate_initial_output_box(
                 map_to_output, canvas, page, zoom, err);
-        if(!ERR_OK)
+        if(!ERR_OK(err))
             { return; } 
 
         //outline it on the canvas
         make_output_box_lines(map_to_output, initial_output_box, canvas, err);
-        if(!ERR_OK)
+        if(!ERR_OK(err))
             { return; } 
 
         //make sure the output box is visible
         scroll_to_output_box(map_to_output, canvas, 
                 ui.cur_page, ui.zoom, map_to_output->output_box, err);
-        if(!ERR_OK)
+        if(!ERR_OK(err))
             { return; } 
 
         //call the driver
@@ -717,18 +717,18 @@ void map_to_output_do_mapping(
         {
             //make sure the canvas is drawing the box in the correct position
             update_lines_from_output_box(map_to_output, map_to_output->output_box, err);
-            if(!ERR_OK)
+            if(!ERR_OK(err))
                 { return; } 
 
             //make sure the output box is visible
             scroll_to_output_box(map_to_output, canvas, 
                     ui.cur_page, ui.zoom, map_to_output->output_box, err);
-            if(!ERR_OK)
+            if(!ERR_OK(err))
                 { return; } 
 
             //call the driver
             map_to_output_coords_from_output_box(map_to_output, map_to_output->output_box, err);
-            if(!ERR_OK)
+            if(!ERR_OK(err))
                 { return; } 
 
         }
