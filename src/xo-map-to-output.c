@@ -4,6 +4,7 @@
 #include "xo-tablet-driver.h"
 #include "xo-map-to-output-error.h"
 #include "xo-map-to-output-canvas-functions.h"
+#include "xo-callbacks.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -623,11 +624,21 @@ void map_to_output_shift_down(
         MapToOutputError* err)
 {
     if(!ERR_OK)
-    {
-        return;
-    }
+    { return; }
 
     OutputBox shifted_output_box = shift_output_box_down(*map_to_output->output_box);
+
+    enum ShiftDownResult shift_result = 
+        predict_shift_down_changes(canvas, page, zoom, map_to_output, err);
+    if(!ERR_OK)
+    { return; }
+
+    //we'll need a new page so create one programmatically
+    if(shift_result == NEW_PAGE)
+    {
+        on_journalNewPageAfter_activate(NULL, NULL);
+    }
+
 
     //save the current output box in case there's an error
     OutputBox old_output_box = *map_to_output->output_box;
