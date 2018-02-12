@@ -14,7 +14,7 @@
 /*******GLOBALS********/
 /**********************/
 //allocate the globals forward-declared in xo-map-to-output-callbacks.h
-MapToOutput* GLOBAL_MAP_TO_OUTPUT;
+MapToOutput* GLOBAL_MAP_TO_OUTPUT = NULL;
 G_LOCK_DEFINE(GLOBAL_MAP_TO_OUTPUT);
 /**********************/
 
@@ -587,16 +587,16 @@ void update_lines_from_output_box(
     output_box_to_lines(box, top, right, bottom, left);
 
     //update the points for the canvas line items
-    if(err->err_type == NO_ERROR) {
+    if(ERR_OK(err)) {
         set_line_points(map_to_output->top_line, top, err);
     }
-    if(err->err_type == NO_ERROR) {
+    if(ERR_OK(err)) {
         set_line_points(map_to_output->right_line, right, err);
     }
-    if(err->err_type == NO_ERROR) {
+    if(ERR_OK(err)) {
         set_line_points(map_to_output->bottom_line, bottom, err);
     }
-    if(err->err_type == NO_ERROR) {
+    if(ERR_OK(err)) {
         set_line_points(map_to_output->left_line, left, err);
     }
 }
