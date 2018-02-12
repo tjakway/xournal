@@ -303,6 +303,7 @@ static MapToOutput* alloc_map_to_output()
 
 MapToOutput* init_map_to_output(
         MapToOutputConfig* config_param, 
+        double zoom,
         MapToOutputError* err)
 {
     MapToOutputConfig* config;
@@ -352,6 +353,7 @@ MapToOutput* init_map_to_output(
     }
 
 
+    map_to_output->pixels_per_unit = zoom;
 
     map_to_output_do_mapping(map_to_output, TRUE, err);
 
@@ -441,10 +443,10 @@ void map_to_output_asserts(MapToOutput* map_to_output)
     //do non-fatal checks before the assertions
     //if unsigned types are equal to their max, it's probably an error
     //(likely caused by an overflow)
-    g_warn_if_fail(map_to_output->tablet_width == INT_MAX);
-    g_warn_if_fail(map_to_output->tablet_height == INT_MAX);
-    g_warn_if_fail(map_to_output->height == G_MAXUINT);
-    g_warn_if_fail(map_to_output->width == G_MAXUINT);
+    g_warn_if_fail(map_to_output->tablet_width != INT_MAX);
+    g_warn_if_fail(map_to_output->tablet_height != INT_MAX);
+    g_warn_if_fail(map_to_output->height != G_MAXUINT);
+    g_warn_if_fail(map_to_output->width != G_MAXUINT);
 
 
     if(map_to_output->mapping_mode == NO_MAPPING)
@@ -457,7 +459,6 @@ void map_to_output_asserts(MapToOutput* map_to_output)
     }
 
     assert(map_to_output->config != NULL);
-    assert(map_to_output->canvas != NULL);
     assert(map_to_output->left_line != NULL);
     assert(map_to_output->right_line != NULL);
     assert(map_to_output->top_line != NULL);
@@ -696,6 +697,22 @@ void map_to_output_do_mapping(
         //calculate the initial output box
         const OutputBox initial_output_box = calculate_initial_output_box(
                 map_to_output, canvas, ui.cur_page, ui.zoom, err);
+        if(!ERR_OK(err))
+            { return; } 
+
+        //allocate space for the new output box
+        if(map_to_output->output_box == NULL)
+        {
+            map_to_output->output_box = malloc(sizeof(OutputBox));
+            if(map_to_output->output_box == NULL)
+            {
+                *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
+            }
+            else
+            {
+                *map_to_output->output_box = initial_output_box;
+            }
+        }
         if(!ERR_OK(err))
             { return; } 
 

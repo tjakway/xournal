@@ -34,8 +34,6 @@ struct OutputBox {
 struct MapToOutput {
     MapToOutputConfig* config;
 
-    GnomeCanvas* canvas;
-
     guint width, height;
     double pixels_per_unit;
 
@@ -60,6 +58,7 @@ struct MapToOutput {
 //pass NULL for default config
 MapToOutput* init_map_to_output(
         MapToOutputConfig*, 
+        double,
         MapToOutputError*);
 
 void free_map_to_output(
