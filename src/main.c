@@ -420,6 +420,7 @@ void init_stuff (int argc, char *argv[])
 
   //TODO
   MapToOutputError err = no_error;
+  assert(err.err_type == NO_ERROR);
   MapToOutput* map_to_output = init_map_to_output(
           NULL, ui.zoom, &err);
 
