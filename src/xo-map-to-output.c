@@ -445,6 +445,8 @@ void map_to_output_asserts(MapToOutput* map_to_output)
     //(likely caused by an overflow)
     g_warn_if_fail(map_to_output->tablet_width != INT_MAX);
     g_warn_if_fail(map_to_output->tablet_height != INT_MAX);
+    g_warn_if_fail(map_to_output->tablet_width > 0);
+    g_warn_if_fail(map_to_output->tablet_height > 0);
 
 
     if(map_to_output->mapping_mode == NO_MAPPING)
