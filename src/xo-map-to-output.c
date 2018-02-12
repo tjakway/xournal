@@ -441,10 +441,10 @@ void map_to_output_asserts(MapToOutput* map_to_output)
     //do non-fatal checks before the assertions
     //if unsigned types are equal to their max, it's probably an error
     //(likely caused by an overflow)
-    g_warn_if_fail(map_to_output->tablet_width == INT_MAX);
-    g_warn_if_fail(map_to_output->tablet_height == INT_MAX);
-    g_warn_if_fail(map_to_output->height == G_MAXUINT);
-    g_warn_if_fail(map_to_output->width == G_MAXUINT);
+    g_warn_if_fail(map_to_output->tablet_width != INT_MAX);
+    g_warn_if_fail(map_to_output->tablet_height != INT_MAX);
+    g_warn_if_fail(map_to_output->height != G_MAXUINT);
+    g_warn_if_fail(map_to_output->width != G_MAXUINT);
 
 
     if(map_to_output->mapping_mode == NO_MAPPING)
