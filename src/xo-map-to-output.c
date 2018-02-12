@@ -754,7 +754,7 @@ void map_to_output_shift_down(
 
 /**
  * allow_new: whether or not to create a new mapping
- * (if false and mapping_mode != NO_MAPPING then nothing will be done)
+ * (if false and mapping_mode == NO_MAPPING then nothing will be done)
  */
 void map_to_output_do_mapping(
         MapToOutput* map_to_output,
@@ -773,7 +773,7 @@ void map_to_output_do_mapping(
     {
         return;
     }
-    else if(map_to_output->mapping_mode == NO_MAPPING)
+    else if(allow_new && map_to_output->mapping_mode == NO_MAPPING)
     {
         //create a new mapping
 
@@ -781,7 +781,7 @@ void map_to_output_do_mapping(
     else if(map_to_output->mapping_mode != NO_MAPPING)
     {
         //it's an existing mapping
-        
+
 
         if(map_to_output->output_box == NULL)
         {
@@ -794,7 +794,22 @@ void map_to_output_do_mapping(
         }
         else
         {
-            //TODO
+            //make sure the canvas is drawing the box in the correct position
+            update_lines_from_output_box(map_to_output, map_to_output->output_box, err);
+            if(!ERR_OK)
+                { return; } 
+
+            //make sure the output box is visible
+            scroll_to_output_box(map_to_output, canvas, 
+                    ui.cur_page, ui.zoom, map_to_output->output_box, err);
+            if(!ERR_OK)
+                { return; } 
+
+            //call the driver
+            map_to_output_coords_from_output_box(map_to_output, map_to_output->output_box, err);
+            if(!ERR_OK)
+                { return; } 
+
         }
     }
 }
