@@ -421,7 +421,7 @@ void init_stuff (int argc, char *argv[])
   //TODO
   MapToOutputError err = no_error;
   MapToOutput* map_to_output = init_map_to_output(
-          NULL, canvas, ui.cur_page, ui.zoom, &err);
+          NULL, &err);
 
     print_canvas_w2c_affine_matrix();
 

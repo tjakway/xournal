@@ -301,9 +301,6 @@ static MapToOutput* alloc_map_to_output()
 
 MapToOutput* init_map_to_output(
         MapToOutputConfig* config_param, 
-        GnomeCanvas* canvas,
-        Page* page,
-        double zoom,
         MapToOutputError* err)
 {
     MapToOutputConfig* config;
@@ -400,9 +397,10 @@ OutputBox calculate_initial_output_box(
             &wc_right_x, &wc_right_y);
 
 
-    const initial_width = wc_right_x - wc_left_x,
-          initial_height = 
-              initial_width / map_to_output_get_tablet_aspect_ratio(map_to_output);
+    const int initial_width = wc_right_x - wc_left_x,
+              initial_height = 
+                 (int)(((double)initial_width) 
+                         / map_to_output_get_tablet_aspect_ratio(map_to_output));
 
     const OutputBox initial_output_box = {
         .top_left_x = wc_left_x,
@@ -681,7 +679,7 @@ void map_to_output_do_mapping(
 
         //calculate the initial output box
         const OutputBox initial_output_box = calculate_initial_output_box(
-                map_to_output, canvas, page, zoom, err);
+                map_to_output, canvas, ui.cur_page, ui.zoom, err);
         if(!ERR_OK(err))
             { return; } 
 
@@ -692,12 +690,12 @@ void map_to_output_do_mapping(
 
         //make sure the output box is visible
         scroll_to_output_box(map_to_output, canvas, 
-                ui.cur_page, ui.zoom, map_to_output->output_box, err);
+                ui.cur_page, ui.zoom, *map_to_output->output_box, err);
         if(!ERR_OK(err))
             { return; } 
 
         //call the driver
-        map_to_output_coords_from_output_box(map_to_output, map_to_output->output_box, err);
+        map_to_output_coords_from_output_box(map_to_output, *map_to_output->output_box, err);
     }
     else if(map_to_output->mapping_mode != NO_MAPPING)
     {
@@ -716,18 +714,18 @@ void map_to_output_do_mapping(
         else
         {
             //make sure the canvas is drawing the box in the correct position
-            update_lines_from_output_box(map_to_output, map_to_output->output_box, err);
+            update_lines_from_output_box(map_to_output, *map_to_output->output_box, err);
             if(!ERR_OK(err))
                 { return; } 
 
             //make sure the output box is visible
             scroll_to_output_box(map_to_output, canvas, 
-                    ui.cur_page, ui.zoom, map_to_output->output_box, err);
+                    ui.cur_page, ui.zoom, *map_to_output->output_box, err);
             if(!ERR_OK(err))
                 { return; } 
 
             //call the driver
-            map_to_output_coords_from_output_box(map_to_output, map_to_output->output_box, err);
+            map_to_output_coords_from_output_box(map_to_output, *map_to_output->output_box, err);
             if(!ERR_OK(err))
                 { return; } 
 

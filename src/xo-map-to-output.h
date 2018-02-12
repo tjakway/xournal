@@ -60,9 +60,6 @@ struct MapToOutput {
 //pass NULL for default config
 MapToOutput* init_map_to_output(
         MapToOutputConfig*, 
-        GnomeCanvas*,
-        Page*,
-        double zoom,
         MapToOutputError*);
 
 void free_map_to_output(
@@ -119,3 +116,9 @@ double map_to_output_get_tablet_aspect_ratio(MapToOutput* map_to_output);
 void update_lines_from_output_box(
         MapToOutput* map_to_output,
         OutputBox box, MapToOutputError* err);
+
+
+void map_to_output_do_mapping(
+        MapToOutput* map_to_output,
+        gboolean allow_new,
+        MapToOutputError* err);
