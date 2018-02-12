@@ -341,7 +341,7 @@ MapToOutput* init_map_to_output(
     }
 
 
-    map_to_output_do_mapping(map_to_output, err);
+    map_to_output_do_mapping(map_to_output, TRUE, err);
 
     //run sanity checks before returning
     map_to_output_asserts(map_to_output);
@@ -665,7 +665,7 @@ void map_to_output_do_mapping(
     g_warn_if_fail(map_to_output != NULL);
     g_warn_if_fail(err != NULL);
 
-    if(!ERR_OK(err)(err))
+    if(!ERR_OK(err))
     {
         return;
     }
