@@ -30,7 +30,7 @@ MapToOutputConfig get_default_config()
 {
     return (MapToOutputConfig){
         .line_color = 0xFF0000FF,
-        .line_width_units = 10,
+        .line_width_units = 1,
         .mapping_allowed_error = 5,
         .driver = wacom_driver
     };

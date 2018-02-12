@@ -8,7 +8,7 @@ void map_to_output_on_window_changed(
 {
     if(map_to_output->mapping_mode != NO_MAPPING)
     {
-
+        //TODO
     }
 }
 
