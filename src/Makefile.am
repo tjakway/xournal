@@ -30,7 +30,8 @@ xournal_SOURCES = \
 	xo-map-to-output-error.h xo-map-to-output-error.c \
 	xo-tablet-driver.h \
 	xo-map-to-output-decl.h xo-map-to-output-canvas-functions.h \
-	xo-map-to-output-callbacks.h xo-map-to-output-canvas-functions.c \
+	xo-map-to-output-callbacks.h xo-map-to-output-callbacks.c \
+	xo-map-to-output-canvas-functions.c \
 	xo-debug.c xo-debug.h xo-wacom-driver.c
 
 if WIN32

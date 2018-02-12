@@ -23,3 +23,7 @@ void map_to_output_on_window_changed(
         MapToOutputError*);
 
 
+gboolean map_to_output_on_gdk_configure(
+        GtkWidget*, GdkEventConfigure*, gpointer);
+
+void map_to_output_register_callbacks(GtkWidget*);

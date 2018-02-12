@@ -34,6 +34,7 @@
 #include "xo-paint.h"
 #include "xo-shapes.h"
 #include "xo-map-to-output.h"
+#include "xo-map-to-output-callbacks.h"
 
 #include "xo-debug.h"
 
@@ -266,6 +267,9 @@ void init_stuff (int argc, char *argv[])
   g_signal_connect ((gpointer) gtk_layout_get_hadjustment(GTK_LAYOUT(canvas)),
                     "value-changed", G_CALLBACK (on_hscroll_changed),
                     NULL);
+
+  map_to_output_register_callbacks(GTK_WINDOW (winMain));
+
   g_object_set_data (G_OBJECT (winMain), "canvas", canvas);
 
   screen = gtk_widget_get_screen(winMain);
