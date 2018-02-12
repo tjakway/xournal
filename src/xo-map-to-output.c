@@ -39,6 +39,8 @@ MapToOutputConfig get_default_config()
 double map_to_output_get_tablet_aspect_ratio(MapToOutput* map_to_output)
 {
     g_warn_if_fail(map_to_output != NULL);
+    g_warn_if_fail(map_to_output->tablet_width > 0);
+    g_warn_if_fail(map_to_output->tablet_height > 0);
 
     return ((double)map_to_output->tablet_width) / ((double)map_to_output->tablet_height);
 }
@@ -322,6 +324,9 @@ MapToOutput* init_map_to_output(
         config = config_param;
     }
 
+    if(!ERR_OK(err))
+    { return NULL; }
+
     MapToOutput* map_to_output = alloc_map_to_output();
     if(map_to_output == NULL)
     {
@@ -336,6 +341,16 @@ MapToOutput* init_map_to_output(
     {
         goto map_to_output_init_error;
     }
+
+    map_to_output->config->driver.get_tablet_dimensions(map_to_output->driver_data,
+            &map_to_output->tablet_width,
+            &map_to_output->tablet_height,
+            err);
+    if(!ERR_OK(err))
+    {
+        goto map_to_output_init_error;
+    }
+
 
 
     map_to_output_do_mapping(map_to_output, TRUE, err);
@@ -397,9 +412,10 @@ OutputBox calculate_initial_output_box(
             &wc_right_x, &wc_right_y);
 
 
-    const int initial_width = wc_right_x - wc_left_x,
-              initial_height = 
-                 (int)(((double)initial_width) 
+    const int initial_width = wc_right_x - wc_left_x;
+    const double initial_width_d = (double)initial_width;
+    const int initial_height = 
+                 (int)(initial_width_d
                          / map_to_output_get_tablet_aspect_ratio(map_to_output));
 
     const OutputBox initial_output_box = {
