@@ -30,7 +30,7 @@ MapToOutputConfig get_default_config()
 {
     return (MapToOutputConfig){
         .line_color = 0xFF0000FF,
-        .line_width_units = 1,
+        .line_width_units = 2,
         .mapping_allowed_error = 5,
         .driver = wacom_driver
     };
@@ -445,8 +445,6 @@ void map_to_output_asserts(MapToOutput* map_to_output)
     //(likely caused by an overflow)
     g_warn_if_fail(map_to_output->tablet_width != INT_MAX);
     g_warn_if_fail(map_to_output->tablet_height != INT_MAX);
-    g_warn_if_fail(map_to_output->height != G_MAXUINT);
-    g_warn_if_fail(map_to_output->width != G_MAXUINT);
 
 
     if(map_to_output->mapping_mode == NO_MAPPING)

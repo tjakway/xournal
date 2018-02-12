@@ -34,7 +34,6 @@ struct OutputBox {
 struct MapToOutput {
     MapToOutputConfig* config;
 
-    guint width, height;
     double pixels_per_unit;
 
     int tablet_width, tablet_height;
