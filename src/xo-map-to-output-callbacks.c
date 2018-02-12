@@ -31,6 +31,23 @@ gboolean map_to_output_on_gdk_configure(
                 configure_event->height);
     }
 #endif
+    if(configure_event->type == GDK_CONFIGURE)
+    {
+        //call map_to_output_on_window_changed with the global map_to_output structure
+        G_LOCK(GLOBAL_MAP_TO_OUTPUT);
+
+        MapToOutputError err = no_error;
+        map_to_output_on_window_changed(GLOBAL_MAP_TO_OUTPUT, &err);
+
+        if(err.err_type != NO_ERROR)
+        {
+            fprintf(stderr, "Error in %s: "
+                    "map_to_output_on_window_changed failed with message %s\n",
+                    __func__, err.err_msg);
+        }
+
+        G_UNLOCK(GLOBAL_MAP_TO_OUTPUT);
+    }
 }
 
 
