@@ -6,6 +6,7 @@
 #include "xo-map-to-output-canvas-functions.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 /**********************/
@@ -787,7 +788,7 @@ void map_to_output_do_mapping(
             *err = (MapToOutputError){
                 .err_type = NO_OUTPUT_BOX,
                 .err_msg = "map_to_output->output_box == NULL even though "
-                    "mapping_mode != NO_MAPPING (line " __LINE__ " of " __FILE__ ")"
+                    "mapping_mode != NO_MAPPING (line " LINE_STR " of " __FILE__ ")"
             };
             return;
         }

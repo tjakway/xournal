@@ -41,9 +41,13 @@ typedef struct MapToOutputError {
 } MapToOutputError;
 
 
+#define MAP_TO_OUTPUT_STRINGIFY__(x) #x
+#define MAP_TO_OUTPUT_TO_STRING(x) MAP_TO_OUTPUT_STRINGIFY__(x)
+#define LINE_STR MAP_TO_OUTPUT_TO_STRING(__LINE__)
+
 #define MAP_TO_OUTPUT_ERROR_BAD_MALLOC (MapToOutputError) { \
         .err_type = BAD_MALLOC, \
-        .err_msg = "malloc returned NULL, reported on line " __LINE__ " of file " __FILE__  \
+        .err_msg = ("malloc returned NULL, reported on line " LINE_STR " of file " __FILE__)  \
     };
 
 #define ERR_OK(err) (err != NULL && err->err_type == NO_ERROR)
