@@ -71,15 +71,6 @@ static int parse_str_to_int(char* to_parse, MapToOutputError* err)
         };
         return -1;
     }
-    else if(res == 0)
-    {
-        *err = (MapToOutputError){
-            .err_type = WACOM_GET_AREA_PARSING_ERROR,
-            .err_msg = "error parsing output of xsetwacom --get <device_name> Area"
-                " (strtoimax returned 0, indicating nothing to convert)" 
-        };
-        return -1;
-    }
     //too large or too small to parse into the return type
     else if(res == INTMAX_MAX && errno == ERANGE)
     {
