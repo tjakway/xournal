@@ -10,9 +10,6 @@
 extern MapToOutput* GLOBAL_MAP_TO_OUTPUT;
 G_LOCK_EXTERN(GLOBAL_MAP_TO_OUTPUT);
 
-void map_to_output_on_canvas_button_press(GtkWidget *widget,
-                                        GdkEventButton *event);
-
 
 /**
  * TODO: this is necessary because we're mapping **screen** pixels to the canvas so we need

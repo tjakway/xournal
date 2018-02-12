@@ -410,52 +410,7 @@ MapToOutput* init_map_to_output(
     }
 
 
-    //need the tablet dimensions to calculate the aspect ratio
-    map_to_output->config->driver.get_tablet_dimensions(
-            map_to_output->driver_data,
-            &map_to_output->tablet_width,
-            &map_to_output->tablet_height,
-            err);
-    if(err->err_type != NO_ERROR)
-    {
-        //if get_tablet_dimensions failed the driver will have set *err
-        goto map_to_output_init_error; 
-    }
-
-    const OutputBox initial_output_box = calculate_initial_output_box(
-            map_to_output, canvas, page, zoom, err);
-
-
-    //call the tablet driver and map the tablet's output to our canvas region
-    map_to_output->config->driver.map_to_output(
-            map_to_output->driver_data,
-            map_to_output,
-            (unsigned int)initial_output_box.top_left_x, 
-            (unsigned int)initial_output_box.top_left_y,
-            (unsigned int)initial_output_box.width,
-            (unsigned int)initial_output_box.height,
-            err);
-    if(err->err_type != NO_ERROR)
-    {
-        goto map_to_output_init_error;
-    }
-    else
-    {
-        //should have an active mapping after calling the driver
-        assert(map_to_output->mapping_mode == MAPPING_ACTIVE);
-    }
-
-    //outline the mapped output box so the user can see it
-    make_output_box_lines(map_to_output, initial_output_box, canvas, err);
-    if(err->err_type != NO_ERROR)
-    {
-        //reset the output mapping before returning
-        MapToOutputError reset_err = no_error;
-        map_to_output->config->driver.reset_map_to_output(map_to_output->driver_data, map_to_output, &reset_err);
-        map_to_output_warn_if_error(&reset_err);
-        
-        goto map_to_output_init_error;
-    }
+    map_to_output_do_mapping(map_to_output, err);
 
     //run sanity checks before returning
     map_to_output_asserts(map_to_output);
@@ -776,7 +731,27 @@ void map_to_output_do_mapping(
     else if(allow_new && map_to_output->mapping_mode == NO_MAPPING)
     {
         //create a new mapping
+        
 
+        //calculate the initial output box
+        const OutputBox initial_output_box = calculate_initial_output_box(
+                map_to_output, canvas, page, zoom, err);
+        if(!ERR_OK)
+            { return; } 
+
+        //outline it on the canvas
+        make_output_box_lines(map_to_output, initial_output_box, canvas, err);
+        if(!ERR_OK)
+            { return; } 
+
+        //make sure the output box is visible
+        scroll_to_output_box(map_to_output, canvas, 
+                ui.cur_page, ui.zoom, map_to_output->output_box, err);
+        if(!ERR_OK)
+            { return; } 
+
+        //call the driver
+        map_to_output_coords_from_output_box(map_to_output, map_to_output->output_box, err);
     }
     else if(map_to_output->mapping_mode != NO_MAPPING)
     {
