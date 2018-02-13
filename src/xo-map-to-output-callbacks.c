@@ -1,4 +1,5 @@
 #include "xo-map-to-output-callbacks.h"
+#include "xo-map-to-output-error.h"
 
 #include <stdio.h>
 
@@ -6,9 +7,10 @@ void map_to_output_on_window_changed(
         MapToOutput* map_to_output, 
         MapToOutputError* err)
 {
-    if(map_to_output->mapping_mode != NO_MAPPING)
+    if(map_to_output != NULL && ERR_OK(err)
+            && map_to_output->mapping_mode != NO_MAPPING)
     {
-        //TODO
+        map_to_output_do_mapping(map_to_output, FALSE, err);
     }
 }
 
@@ -35,17 +37,23 @@ gboolean map_to_output_on_gdk_configure(
     {
         //call map_to_output_on_window_changed with the global map_to_output structure
         G_LOCK(GLOBAL_MAP_TO_OUTPUT);
-
-        MapToOutputError err = no_error;
-        map_to_output_on_window_changed(GLOBAL_MAP_TO_OUTPUT, &err);
-
-        if(err.err_type != NO_ERROR)
+        if(GLOBAL_MAP_TO_OUTPUT != NULL)
         {
-            fprintf(stderr, "Error in %s: "
-                    "map_to_output_on_window_changed failed with message %s\n",
-                    __func__, err.err_msg);
-        }
+            MapToOutputError* err = malloc(sizeof(MapToOutputError));
+            *err = no_error;
+            map_to_output_on_window_changed(GLOBAL_MAP_TO_OUTPUT, err);
 
+            if(err->err_type != NO_ERROR)
+            {
+                fprintf(stderr, "Error in %s: "
+                        "map_to_output_on_window_changed failed with message %s\n",
+                        __func__, err->err_msg);
+            }
+            if(err != NULL)
+            {
+                free(err);
+            }
+        }
         G_UNLOCK(GLOBAL_MAP_TO_OUTPUT);
     }
 }

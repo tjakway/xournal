@@ -50,7 +50,7 @@ typedef struct MapToOutputError {
         .err_msg = ("malloc returned NULL, reported on line " LINE_STR " of file " __FILE__)  \
     };
 
-#define ERR_OK(err) (err != NULL && err->err_type == NO_ERROR)
+#define ERR_OK(x) (x != NULL && x->err_type == NO_ERROR)
 
 void map_to_output_warn_if_error(MapToOutputError*);
 
