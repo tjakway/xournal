@@ -581,7 +581,12 @@ void update_lines_from_output_box(
         MapToOutput* map_to_output,
         OutputBox box, MapToOutputError* err)
 {
-    double top[2], right[2], bottom[2], left[2];
+    const int POINT_ARRAY_SIZE=4;
+
+    double top[POINT_ARRAY_SIZE], 
+           right[POINT_ARRAY_SIZE], 
+           bottom[POINT_ARRAY_SIZE], 
+           left[POINT_ARRAY_SIZE];
 
     //get line points
     output_box_to_lines(box, top, right, bottom, left);
