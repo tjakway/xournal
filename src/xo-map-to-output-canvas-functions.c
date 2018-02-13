@@ -70,14 +70,13 @@ void map_to_output_get_canvas_drawing_area_dimensions(
     gint canvas_widget_top_left_x = -1, canvas_widget_top_left_y = -1;
     gdk_window_get_origin(gtk_widget_get_window(GTK_WIDGET(canvas)), &canvas_widget_top_left_x, &canvas_widget_top_left_y);
 
+    //when dragging the window to full screen sometimes we get strange results
     if(canvas_widget_top_left_x < 0 || canvas_widget_top_left_y < 0)
     {
-        static const MapToOutputError gdk_error = {
-            .err_type = MAPTOOUTPUT_GDK_ERROR,
-            .err_msg = "gdk_window_get_origin returned nonsensical results (x<0 or y<0)"
-        };
-        *err = gdk_error;
-        goto get_canvas_drawing_area_dimensions_error;
+        fprintf(stderr, "Received nonsensical results from gdk_window_get_origin (x = %u, y = %u)," 
+                " correcting to (0, 0)\n", canvas_widget_top_left_x, canvas_widget_top_left_y);
+        canvas_widget_top_left_x = 0;
+        canvas_widget_top_left_y = 0;
     }
 
     //the width of the canvas widget in pixels
