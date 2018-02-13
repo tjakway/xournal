@@ -183,8 +183,8 @@ static void output_box_to_lines(OutputBox output_box,
     left[1].coords[1] = bottom_left[1];
 }
 
-static void set_line_points(GnomeCanvasItem* item,
-        double points[2], MapToOutputError* err)
+static void set_or_replace_line_points(GnomeCanvasItem* item,
+        double points[4], MapToOutputError* err)
 {
     GnomeCanvasPoints* canvas_points = gnome_canvas_points_new(2);
     if(canvas_points == NULL)
@@ -193,10 +193,16 @@ static void set_line_points(GnomeCanvasItem* item,
     }
     else
     {
-        canvas_points->coords[0] = points[0];
-        canvas_points->coords[1] = points[1];
+        //first point
+        canvas_points[0].coords[0] = points[0];
+        canvas_points[0].coords[1] = points[1];
+        
+        //second point
+        canvas_points[1].coords[0] = points[2];
+        canvas_points[1].coords[1] = points[3];
 
-        gnome_canvas_item_set(item, "points", points, NULL);
+        //TODO: double check that this unref's the original GnomeCanvasPoints* properly
+        gnome_canvas_item_set(item, "points", canvas_points, NULL);
     }
 }
 
@@ -226,10 +232,10 @@ static void make_output_box_lines(
     }
 
     output_box_to_lines(output_box, 
-            top_line_points->coords,
-            right_line_points->coords,
-            bottom_line_points->coords,
-            left_line_points->coords);
+            top_line_points,
+            right_line_points,
+            bottom_line_points,
+            left_line_points);
 
     const guint line_color = output->config->line_color;
     const double line_width_units = output->config->line_width_units;
