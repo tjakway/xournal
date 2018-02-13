@@ -128,10 +128,10 @@ void output_box_to_array(OutputBox output_box, double points[8])
 }
 
 static void output_box_to_lines(OutputBox output_box,
-        double* top, 
-        double* right,
-        double* bottom,
-        double* left)
+        GnomeCanvasPoints* top, 
+        GnomeCanvasPoints* right,
+        GnomeCanvasPoints* bottom,
+        GnomeCanvasPoints* left)
 {
     const double top_left[] = { output_box.top_left_x, output_box.top_left_y };
 
@@ -148,39 +148,39 @@ static void output_box_to_lines(OutputBox output_box,
 
 
     //top point 1 = top left
-    top[0] = top_left[0];
-    top[1] = top_left[1];
+    top[0].coords[0] = top_left[0];
+    top[0].coords[1] = top_left[1];
 
     //top point 2 = top right
-    top[2] = top_right[0];
-    top[3] = top_right[1];
+    top[1].coords[0] = top_right[0];
+    top[1].coords[1] = top_right[1];
 
     
     //right point 1 = top right
-    right[0] = top_right[0];
-    right[1] = top_right[1];
+    right[0].coords[0] = top_right[0];
+    right[0].coords[1] = top_right[1];
 
     //right point 2 = bottom right
-    right[2] = bottom_right[0];
-    right[3] = bottom_right[1];
+    right[1].coords[0] = bottom_right[0];
+    right[1].coords[1] = bottom_right[1];
 
 
     //bottom point 1 = bottom left
-    bottom[0] = bottom_left[0];
-    bottom[1] = bottom_left[1];
+    bottom[0].coords[0] = bottom_left[0];
+    bottom[0].coords[1] = bottom_left[1];
 
     //bottom point 2 = bottom right
-    bottom[2] = bottom_right[0];
-    bottom[3] = bottom_right[1];
+    bottom[1].coords[0] = bottom_right[0];
+    bottom[1].coords[1] = bottom_right[1];
 
     
     //left point 1 = top left
-    left[0] = top_left[0];
-    left[1] = top_left[1];
+    left[0].coords[0] = top_left[0];
+    left[0].coords[1] = top_left[1];
 
     //left point 2 = bottom left
-    left[2] = bottom_left[0];
-    left[3] = bottom_left[1];
+    left[1].coords[0] = bottom_left[0];
+    left[1].coords[1] = bottom_left[1];
 }
 
 static void set_line_points(GnomeCanvasItem* item,
