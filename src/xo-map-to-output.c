@@ -184,26 +184,24 @@ static void output_box_to_lines(OutputBox output_box,
 }
 
 static void set_or_replace_line_points(GnomeCanvasItem* item,
-        double points[4], MapToOutputError* err)
+        GnomeCanvasPoints* canvas_points, MapToOutputError* err)
 {
-    GnomeCanvasPoints* canvas_points = gnome_canvas_points_new(2);
-    if(canvas_points == NULL)
+    g_warn_if_fail(err != NULL);
+    assert(canvas_points != NULL);
+
+    if(canvas_points == NULL && err != NULL)
     {
-        *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
+        *err = (MapToOutputError) {
+            .err_type = CANVAS_INIT_ERROR,
+            .err_msg = "NULL GnomeCanvasPoints* passed to set_or_replace_line_points"
+        };
     }
     else
     {
-        //first point
-        canvas_points[0].coords[0] = points[0];
-        canvas_points[0].coords[1] = points[1];
-        
-        //second point
-        canvas_points[1].coords[0] = points[2];
-        canvas_points[1].coords[1] = points[3];
-
         //TODO: double check that this unref's the original GnomeCanvasPoints* properly
         gnome_canvas_item_set(item, "points", canvas_points, NULL);
     }
+
 }
 
 static void make_output_box_lines(
@@ -587,23 +585,47 @@ void update_lines_from_output_box(
         MapToOutput* map_to_output,
         OutputBox box, MapToOutputError* err)
 {
-    double top[2], right[2], bottom[2], left[2];
+    g_warn_if_fail(err != NULL);
 
-    //get line points
-    output_box_to_lines(box, top, right, bottom, left);
+    GnomeCanvasPoints *top = gnome_canvas_points_new(2),
+                      *right = gnome_canvas_points_new(2),
+                      *bottom = gnome_canvas_points_new(2),
+                      *left = gnome_canvas_points_new(2);
 
-    //update the points for the canvas line items
-    if(ERR_OK(err)) {
-        set_line_points(map_to_output->top_line, top, err);
+    if(top == NULL
+            || right == NULL
+            || bottom == NULL
+            || left == NULL)
+    {
+        *err = (MapToOutputError) {
+            .err_type = CANVAS_INIT_ERROR,
+            .err_msg = "gnome_canvas_points_new(2) returned NULL"
+        };
     }
-    if(ERR_OK(err)) {
-        set_line_points(map_to_output->right_line, right, err);
-    }
-    if(ERR_OK(err)) {
-        set_line_points(map_to_output->bottom_line, bottom, err);
-    }
-    if(ERR_OK(err)) {
-        set_line_points(map_to_output->left_line, left, err);
+    else
+    {
+        //get line points
+        output_box_to_lines(box, top, right, bottom, left);
+
+        //update the points for the canvas line items
+        if(ERR_OK(err)) {
+            set_or_replace_line_points(map_to_output->top_line, top, err);
+        }
+        if(ERR_OK(err)) {
+            set_or_replace_line_points(map_to_output->right_line, right, err);
+        }
+        if(ERR_OK(err)) {
+            set_or_replace_line_points(map_to_output->bottom_line, bottom, err);
+        }
+        if(ERR_OK(err)) {
+            set_or_replace_line_points(map_to_output->left_line, left, err);
+        }
+
+        //decrement refcount so they'll be freed properly
+        gnome_canvas_points_unref(top);
+        gnome_canvas_points_unref(right);
+        gnome_canvas_points_unref(bottom);
+        gnome_canvas_points_unref(left);
     }
 }
 
