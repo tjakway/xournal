@@ -26,14 +26,6 @@
 #define MATCH_TABLET_DIMENSIONS_RGX_NUM_GROUPS 4
 
 
-#define XO_LOG_GERROR(cmd) do {  \
-            const char* msg = gerr_ptr != NULL ? gerr_ptr->message \
-                    : "gerr_ptr == NULL, no glib error string available"; \
-            g_log(NULL, G_LOG_LEVEL_WARNING, \
-                    "error in %s during call to tablet driver: `%s`, " \
-                    "glib reports error as: %s\n", \
-                    __func__, cmd, msg); \
-            } while(0);
 
 
 static void free_parsing_regexes(struct WacomParsingRegexes*);

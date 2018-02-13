@@ -11,16 +11,14 @@ extern MapToOutput* GLOBAL_MAP_TO_OUTPUT;
 G_LOCK_EXTERN(GLOBAL_MAP_TO_OUTPUT);
 
 
-/**
- * TODO: this is necessary because we're mapping **screen** pixels to the canvas so we need
- * to resize it such that the same window is shown
- */
-void map_to_output_on_window_changed(
-        MapToOutput*, 
-        MapToOutputError*);
-
-
 gboolean map_to_output_on_gdk_configure(
         GtkWidget*, GdkEventConfigure*, gpointer);
 
 void map_to_output_register_callbacks(GtkWidget*);
+
+//sets a flag to shutdown the remap thread
+void shutdown_remap_thread();
+
+//how often the remap thread should run, in milliseconds
+#define REMAP_THREAD_INTERVAL 100
+#define REMAP_THREAD_NAME "remap_thread"

@@ -14,6 +14,8 @@ enum MapToOutputErrorType {
 
     NO_OUTPUT_BOX,
 
+    GLIB_THREAD_ERROR,
+
     /** a gdk call failed or returned nonsensical results 
      * can't use GDK_ERROR because it's already defined by GDK... */
     MAPTOOUTPUT_GDK_ERROR,
@@ -51,6 +53,16 @@ typedef struct MapToOutputError {
     };
 
 #define ERR_OK(x) (x != NULL && x->err_type == NO_ERROR)
+
+
+#define XO_LOG_GERROR(desc) do {  \
+            const char* msg = gerr_ptr != NULL ? gerr_ptr->message \
+                    : "gerr_ptr == NULL, no glib error string available"; \
+            g_log(NULL, G_LOG_LEVEL_WARNING, \
+                    "error in %s: `%s`, " \
+                    "glib reports error as: %s\n", \
+                    __func__, desc, msg); \
+            } while(0);
 
 void map_to_output_warn_if_error(MapToOutputError*);
 
