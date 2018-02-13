@@ -14,7 +14,7 @@ G_LOCK_EXTERN(GLOBAL_MAP_TO_OUTPUT);
 gboolean map_to_output_on_gdk_configure(
         GtkWidget*, GdkEventConfigure*, gpointer);
 
-void map_to_output_register_callbacks(GtkWidget*);
+void map_to_output_register_callbacks(GtkWidget*, MapToOutputError*);
 
 //sets a flag to shutdown the remap thread
 void shutdown_remap_thread();

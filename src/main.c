@@ -268,7 +268,8 @@ void init_stuff (int argc, char *argv[])
                     "value-changed", G_CALLBACK (on_hscroll_changed),
                     NULL);
 
-  map_to_output_register_callbacks(GTK_WINDOW (winMain));
+  MapToOutputError err = no_error;
+  map_to_output_register_callbacks(GTK_WINDOW (winMain), &err);
 
   g_object_set_data (G_OBJECT (winMain), "canvas", canvas);
 
@@ -419,8 +420,6 @@ void init_stuff (int argc, char *argv[])
 
 
   //TODO
-  MapToOutputError err = no_error;
-  assert(err.err_type == NO_ERROR);
   MapToOutput* map_to_output = init_map_to_output(
           NULL, ui.zoom, &err);
 

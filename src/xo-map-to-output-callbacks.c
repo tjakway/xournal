@@ -48,7 +48,7 @@ void shutdown_remap_thread()
 //read by this thread that then calls the driver
 //this is to prevent a flood of driver calls because sometimes GTK
 //will send a TON of GDK_CONFIGURE events
-gpointer remap_thread_work(gpointer /*ignored*/)
+gpointer remap_thread_work(gpointer __ignored)
 {
     do
     {
@@ -95,7 +95,7 @@ void launch_remap_thread(MapToOutputError* err)
 {
     g_atomic_int_set(&SHUTDOWN_REMAP_THREAD_FLAG, FALSE);
 
-    GError* err = NULL;
+    GError* gerr_ptr = NULL;
     GThread* new_remap_thread = g_thread_try_new(
             REMAP_THREAD_NAME,
             &remap_thread_work, 
@@ -148,10 +148,13 @@ gboolean map_to_output_on_gdk_configure(
 }
 
 
-void map_to_output_register_callbacks(GtkWidget* window)
+void map_to_output_register_callbacks(GtkWidget* window, MapToOutputError* err)
 {
-    g_signal_connect(window, "configure_event", 
-            G_CALLBACK(map_to_output_on_gdk_configure), NULL);
+    if(ERR_OK(err))
+    {
+        g_signal_connect(window, "configure_event", 
+                G_CALLBACK(map_to_output_on_gdk_configure), NULL);
 
-    launch_remap_thread();
+        launch_remap_thread(err);
+    }
 }
