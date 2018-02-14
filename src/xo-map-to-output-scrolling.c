@@ -20,6 +20,9 @@ typedef enum ScrollAction {
     SCROLL_RIGHT=5
 } ScrollAction;
 
+/**
+ * ******CALLER FREE******
+ */
 static ScrollAction* make_scroll_plan(GnomeCanvas* canvas, 
         OutputBox* box,
         int* length, 
