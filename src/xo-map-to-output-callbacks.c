@@ -145,6 +145,8 @@ gboolean map_to_output_on_gdk_configure(
     {
         SET_NEED_REMAP_TRUE;
     }
+
+    return FALSE;
 }
 
 
