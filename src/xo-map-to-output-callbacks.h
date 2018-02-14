@@ -17,7 +17,7 @@ gboolean map_to_output_on_gdk_configure(
 void map_to_output_register_callbacks(GtkWidget*, MapToOutputError*);
 
 //sets a flag to shutdown the remap thread
-void shutdown_remap_thread();
+void shutdown_remap_thread(void);
 
 //how often the remap thread should run, in milliseconds
 #define REMAP_THREAD_INTERVAL 100

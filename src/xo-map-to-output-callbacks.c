@@ -31,7 +31,7 @@ static void map_to_output_on_window_changed(
 }
 
 
-void shutdown_remap_thread()
+void shutdown_remap_thread(void)
 {
     //tell the thread to shutdown 
     g_atomic_int_set(&SHUTDOWN_REMAP_THREAD_FLAG, TRUE);
