@@ -99,7 +99,7 @@ void launch_remap_thread(MapToOutputError* err)
     GThread* new_remap_thread = g_thread_try_new(
             REMAP_THREAD_NAME,
             &remap_thread_work, 
-            NULL, &err);
+            NULL, &gerr_ptr);
 
     //check that launch was successful, warn the user otherwise
     if(new_remap_thread == NULL)
