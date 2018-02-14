@@ -634,9 +634,11 @@ void update_lines_from_output_box(
  */
 static void scroll_down_1_unit(GnomeCanvas* canvas)
 {
-    int hoffset = -1, voffset = -1;
+    //TODO: FIX SIGSEGV
+    /*int hoffset = -1, voffset = -1;
     gnome_canvas_get_scroll_offsets(canvas, &hoffset, &voffset);
     gnome_canvas_scroll_to(canvas, hoffset, voffset + 1);
+    */
 }
 
 /**
