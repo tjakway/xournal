@@ -25,6 +25,11 @@
 
 #include <assert.h>
 
+#define X_PROTOCOL 1
+#ifdef X_PROTOCOL
+#include <X11/X.h> //for XInitThreads();
+#endif
+
 #include "xournal.h"
 #include "xo-interface.h"
 #include "xo-support.h"
@@ -268,9 +273,6 @@ void init_stuff (int argc, char *argv[])
                     "value-changed", G_CALLBACK (on_hscroll_changed),
                     NULL);
 
-  MapToOutputError err = no_error;
-  map_to_output_register_callbacks(GTK_WINDOW (winMain), &err);
-
   g_object_set_data (G_OBJECT (winMain), "canvas", canvas);
 
   screen = gtk_widget_get_screen(winMain);
@@ -420,8 +422,10 @@ void init_stuff (int argc, char *argv[])
 
 
   //TODO
+  MapToOutputError err = no_error;
   MapToOutput* map_to_output = init_map_to_output(
           NULL, ui.zoom, &err);
+  map_to_output_register_callbacks(GTK_WINDOW (winMain), &err);
 
     print_canvas_w2c_affine_matrix();
 
@@ -453,6 +457,11 @@ void init_stuff (int argc, char *argv[])
 int
 main (int argc, char *argv[])
 {
+#ifdef X_PROTOCOL
+  printf("using X11\n");
+  XInitThreads();
+#endif
+
   gchar *path, *path1, *path2;
   
 #ifdef ENABLE_NLS

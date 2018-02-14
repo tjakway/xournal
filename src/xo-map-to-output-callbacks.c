@@ -155,13 +155,6 @@ void map_to_output_register_callbacks(GtkWidget* window, MapToOutputError* err)
         g_signal_connect(window, "configure_event", 
                 G_CALLBACK(map_to_output_on_gdk_configure), NULL);
 
-        //needed for glib < 2.32
-        //omitting this causes:
-        //  [xcb] Unknown request in queue while dequeuing
-        //  [xcb] Most likely this is a multi-threaded client and XInitThreads has not been called
-        //  [xcb] Aborting, sorry about that.
-        g_thread_init(NULL);
-
         launch_remap_thread(err);
     }
 }
