@@ -205,7 +205,7 @@ static void set_line_points(GnomeCanvasItem* item,
     }
     else
     {
-        gnome_canvas_item_get(item, "points", &canvas_points, NULL);
+        g_object_get(item, "points", &canvas_points, NULL);
         assert(canvas_points != NULL);
     }
 
