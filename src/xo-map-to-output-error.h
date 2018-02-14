@@ -13,6 +13,7 @@ enum MapToOutputErrorType {
     NEED_NEW_PAGE,
 
     NO_OUTPUT_BOX,
+    SCROLL_PLAN_ERROR,
 
     GLIB_THREAD_ERROR,
 

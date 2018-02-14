@@ -629,36 +629,6 @@ void update_lines_from_output_box(
     }
 }
 
-/**
- * scroll down by 1 unit
- */
-static void scroll_down_1_unit(GnomeCanvas* canvas)
-{
-    //TODO: FIX SIGSEGV
-    /*int hoffset = -1, voffset = -1;
-    gnome_canvas_get_scroll_offsets(canvas, &hoffset, &voffset);
-    gnome_canvas_scroll_to(canvas, hoffset, voffset + 1);
-    */
-}
-
-/**
- * scroll to the output box or do nothing if it's already visible
- */
-static void scroll_to_output_box(
-        MapToOutput* map_to_output, 
-        GnomeCanvas* canvas,
-        Page* page,
-        double zoom,
-        OutputBox output_box,
-        MapToOutputError* err)
-{
-    //programmatically scroll down until the outputbox is visible
-    while(ERR_OK(err) && !output_box_is_visible(canvas, page, zoom, output_box, err))
-    {
-        scroll_down_1_unit(canvas);
-        //TODO: add checks that we didn't scroll too far...
-    }
-}
 
 void map_to_output_shift_down(
         MapToOutput* map_to_output, 
