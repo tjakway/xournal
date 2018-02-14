@@ -184,19 +184,42 @@ static void output_box_to_lines(OutputBox output_box,
 }
 
 static void set_line_points(GnomeCanvasItem* item,
-        double points[2], MapToOutputError* err)
+        double points[2], 
+        /**
+         * whether or not we should allocate a new GnomeCanvasPoints* struct
+         * should only be done once for each GnomeCanvasLine*
+         */
+        gboolean new_line, 
+        MapToOutputError* err)
 {
-    GnomeCanvasPoints* canvas_points = gnome_canvas_points_new(2);
-    if(canvas_points == NULL)
+    GnomeCanvasPoints* canvas_points = NULL;
+    
+    //allocate or get the GnomeCanvasPoints* struct corresponding to this line
+    if(new_line)
     {
-        *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
+        canvas_points = gnome_canvas_points_new(2);
+        if(canvas_points == NULL)
+        {
+            *err = MAP_TO_OUTPUT_ERROR_BAD_MALLOC;
+        }
     }
     else
+    {
+        gnome_canvas_item_get(item, "points", &canvas_points, NULL);
+        assert(canvas_points != NULL);
+    }
+
+
+    if(ERR_OK(err))
     {
         canvas_points->coords[0] = points[0];
         canvas_points->coords[1] = points[1];
 
-        gnome_canvas_item_set(item, "points", points, NULL);
+        if(new_line)
+        {
+            //attach the points struct if this is a new line
+            gnome_canvas_item_set(item, "points", points, NULL);
+        }
     }
 }
 
@@ -593,16 +616,16 @@ void update_lines_from_output_box(
 
     //update the points for the canvas line items
     if(ERR_OK(err)) {
-        set_line_points(map_to_output->top_line, top, err);
+        set_line_points(map_to_output->top_line, top, FALSE, err);
     }
     if(ERR_OK(err)) {
-        set_line_points(map_to_output->right_line, right, err);
+        set_line_points(map_to_output->right_line, right, FALSE, err);
     }
     if(ERR_OK(err)) {
-        set_line_points(map_to_output->bottom_line, bottom, err);
+        set_line_points(map_to_output->bottom_line, bottom, FALSE, err);
     }
     if(ERR_OK(err)) {
-        set_line_points(map_to_output->left_line, left, err);
+        set_line_points(map_to_output->left_line, left, FALSE, err);
     }
 }
 
