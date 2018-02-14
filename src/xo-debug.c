@@ -27,7 +27,7 @@
         return; \
     } } while(0);
 
-void print_canvas_drawing_area_dimensions()
+void print_canvas_drawing_area_dimensions(void)
 {
     DEBUG_PRINT_CHECK_GLOBALS();
 
@@ -64,7 +64,7 @@ void print_canvas_drawing_area_dimensions()
     }
 }
 
-void print_canvas_w2c_affine_matrix()
+void print_canvas_w2c_affine_matrix(void)
 {
     DEBUG_PRINT_CHECK_GLOBALS();
 
@@ -114,7 +114,7 @@ void print_canvas_w2c(double x, double y)
     printf("print_canvas_w2c(%f, %f): (%f, %f)\n", x, y, ret_x, ret_y);
 }
 
-void print_canvas_scroll_offsets()
+void print_canvas_scroll_offsets(void)
 {
     DEBUG_PRINT_CHECK_GLOBALS();
 
@@ -129,6 +129,21 @@ void print_canvas_scroll_offsets()
     }
 
     printf("canvas scroll offsets in pixels: %d, %d\n", ret_x, ret_y);
+}
+
+void print_canvas_scroll_region(void)
+{
+    DEBUG_PRINT_CHECK_GLOBALS();
+
+    double ret_x1 = -1, ret_y1 = -1,
+            ret_x2 = -1, ret_y2 = -1;
+
+    gnome_canvas_get_scroll_region(canvas, &ret_x1, &ret_y1,
+            &ret_x2, &ret_y2);
+
+    printf("canvas scroll region (x1,y1) (x2, y2): "
+            "(%f, %f) (%f, %f)\n", ret_x1, ret_y1,
+            ret_x2, ret_y2);
 }
 
 #endif
