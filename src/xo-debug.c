@@ -1,6 +1,7 @@
 #include "xo-debug.h"
 #include "xournal.h"
 #include "xo-map-to-output-error.h"
+#include "xo-map-to-output-callbacks.h"
 #include "xo-map-to-output-canvas-functions.h"
 
 #include <stdio.h>
@@ -144,6 +145,21 @@ void print_canvas_scroll_region(void)
     printf("canvas scroll region (x1,y1) (x2, y2): "
             "(%f, %f) (%f, %f)\n", ret_x1, ret_y1,
             ret_x2, ret_y2);
+}
+
+void print_output_box_is_visible(void)
+{
+    DEBUG_PRINT_CHECK_GLOBALS();
+
+    MapToOutputError err = no_error;
+    printf("output box is visible: %s\n", 
+            output_box_is_visible(canvas, ui.cur_page, ui.zoom,
+                *GLOBAL_MAP_TO_OUTPUT->output_box, &err) ? "true" : "false");
+
+    if(err.err_type != NO_ERROR)
+    {
+        printf("Error in %s: %s", "output_box_is_visible\n", err.err_msg);
+    }
 }
 
 #endif
