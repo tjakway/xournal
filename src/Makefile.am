@@ -32,7 +32,8 @@ xournal_SOURCES = \
 	xo-map-to-output-decl.h xo-map-to-output-canvas-functions.h \
 	xo-map-to-output-callbacks.h xo-map-to-output-callbacks.c \
 	xo-map-to-output-canvas-functions.c \
-	xo-debug.c xo-debug.h xo-wacom-driver.c
+	xo-debug.c xo-debug.h xo-wacom-driver.c \
+	xo-map-to-output-scrolling.c xo-map-to-output-scrolling.h
 
 if WIN32
   xournal_LDFLAGS = -mwindows

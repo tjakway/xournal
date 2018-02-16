@@ -137,10 +137,10 @@ void scroll_to_output_box(
         MapToOutputError* err)
 {
     //programmatically scroll down until the outputbox is visible
-    while(ERR_OK(err) && !output_box_is_visible(canvas, page, zoom, output_box, err))
+/*    while(ERR_OK(err) && !output_box_is_visible(canvas, page, zoom, output_box, err))
     {
 
         scroll_down_1_unit(canvas);
         //TODO: add checks that we didn't scroll too far...
-    }
+    }*/
 }
