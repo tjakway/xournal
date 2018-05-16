@@ -427,7 +427,9 @@ void init_stuff (int argc, char *argv[])
           NULL, ui.zoom, &err);
   map_to_output_register_callbacks(GTK_WINDOW (winMain), &err);
 
+#ifdef DEBUG
     print_canvas_w2c_affine_matrix();
+#endif
 
 
   // and finally, open a file specified on the command line
