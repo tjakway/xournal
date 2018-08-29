@@ -27,7 +27,6 @@ FILE(GLOB MAIN_LIB_SRC src/*.cpp src/*.c src/*.cxx)
 LIST(REMOVE_ITEM MAIN_LIB_SRC ${MAIN_SRC_FILE})
 
 
-target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${GTK2_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/src)
 #include_directories(${CMAKE_SOURCE_DIR}/include)
 
@@ -36,13 +35,18 @@ link_directories(${GNOME_CANVAS_LIBRARY_DIRS})
 link_directories(${POPPLER_GLIB_LIBRARY_DIRS})
 link_directories(${PANGOFT2_LIBRARY_DIRS})
 
-target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${})
+
+add_library(${MAIN_LIB_TARGET} ${MAIN_LIB_SRC})
+
+target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${GTK2_INCLUDE_DIRS})
+
 target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${GNOME_CANVAS_INCLUDEDIR})
 target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${POPPER_GLIB_INCLUDEDIR})
 target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${PANGOFT2_INCLUDEDIR})
 
-
-add_library(${MAIN_LIB_TARGET} ${MAIN_LIB_SRC})
+target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${GNOME_CANVAS_LIBRARIES})
+target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${POPPER_GLIB_LIBRARIES})
+target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${PANGOFT2_LIBRARIES})
 
 
 add_executable(${MAIN_EXE_TARGET} ${MAIN_SRC_FILE})
