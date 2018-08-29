@@ -61,4 +61,4 @@ add_executable(${MAIN_EXE_TARGET} ${MAIN_SRC_FILE})
 
 target_link_libraries(${MAIN_EXE_TARGET} PRIVATE ${MAIN_LIB_TARGET})
 target_link_libraries(${MAIN_LIB_TARGET} PRIVATE ${GTK2_LIBRARIES})
-target_add_definitions(${MAIN_LIB_TARGET} ${GTK2_DEFINITIONS})
+target_compile_definitions(${MAIN_LIB_TARGET} ${GTK2_DEFINITIONS})
