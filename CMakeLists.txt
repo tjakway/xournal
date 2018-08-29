@@ -5,6 +5,7 @@ set(MAIN_LIB_TARGET "libxournal")
 set(MAIN_EXE_TARGET "xournal")
 
 find_package(GTK2 2.10.0 REQUIRED)
+find_package(ZLIB REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 #function(target_requires_pkg PARAM_TARGET_NAME PARAM_PKG_NAME PARAM_PKG_PREFIX)
@@ -38,11 +39,18 @@ link_directories(${PANGOFT2_LIBRARY_DIRS})
 
 add_library(${MAIN_LIB_TARGET} ${MAIN_LIB_SRC})
 
-target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${GTK2_INCLUDE_DIRS})
+target_include_directories(${MAIN_LIB_TARGET} INTERFACE ${GTK2_INCLUDE_DIRS})
+target_include_directories(${MAIN_LIB_TARGET} INTERFACE ${ZLIB_INCLUDE_DIRS})
 
-target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${GNOME_CANVAS_INCLUDEDIR})
-target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${POPPER_GLIB_INCLUDEDIR})
-target_include_directories(${MAIN_LIB_TARGET} PRIVATE ${PANGOFT2_INCLUDEDIR})
+target_include_directories(${MAIN_LIB_TARGET} INTERFACE ${GNOME_CANVAS_INCLUDEDIR})
+target_include_directories(${MAIN_LIB_TARGET} INTERFACE ${POPPER_GLIB_INCLUDEDIR})
+target_include_directories(${MAIN_LIB_TARGET} INTERFACE ${PANGOFT2_INCLUDEDIR})
+
+target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${GTK2_LIBRARIES})
+target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${ZLIB_LIBRARIES})
+
+#link the math library
+target_link_libraries(${MAIN_LIB_TARGET} INTERFACE m)
 
 target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${GNOME_CANVAS_LIBRARIES})
 target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${POPPER_GLIB_LIBRARIES})
@@ -51,6 +59,6 @@ target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${PANGOFT2_LIBRARIES})
 
 add_executable(${MAIN_EXE_TARGET} ${MAIN_SRC_FILE})
 
-target_link_libraries(${MAIN_EXE_TARGET} ${MAIN_LIB_TARGET})
+target_link_libraries(${MAIN_EXE_TARGET} PRIVATE ${MAIN_LIB_TARGET})
 target_link_libraries(${MAIN_LIB_TARGET} PRIVATE ${GTK2_LIBRARIES})
 target_add_definitions(${MAIN_LIB_TARGET} ${GTK2_DEFINITIONS})
